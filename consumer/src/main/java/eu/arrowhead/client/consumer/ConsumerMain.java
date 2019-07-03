@@ -9,14 +9,16 @@
 
 package eu.arrowhead.client.consumer;
 
-import eu.arrowhead.client.common.can_be_modified.model.TemperatureReadout;
-import eu.arrowhead.client.common.no_need_to_modify.Utility;
-import eu.arrowhead.client.common.no_need_to_modify.exception.ArrowheadException;
-import eu.arrowhead.client.common.no_need_to_modify.misc.TypeSafeProperties;
-import eu.arrowhead.client.common.no_need_to_modify.model.ArrowheadService;
-import eu.arrowhead.client.common.no_need_to_modify.model.ArrowheadSystem;
-import eu.arrowhead.client.common.no_need_to_modify.model.OrchestrationResponse;
-import eu.arrowhead.client.common.no_need_to_modify.model.ServiceRequestForm;
+import eu.arrowhead.client.common.CertificateBootstrapper;
+import eu.arrowhead.client.common.Utility;
+import eu.arrowhead.client.common.exception.ArrowheadException;
+import eu.arrowhead.client.common.misc.ClientType;
+import eu.arrowhead.client.common.misc.TypeSafeProperties;
+import eu.arrowhead.client.common.model.ArrowheadService;
+import eu.arrowhead.client.common.model.ArrowheadSystem;
+import eu.arrowhead.client.common.model.OrchestrationResponse;
+import eu.arrowhead.client.common.model.ServiceRequestForm;
+import eu.arrowhead.client.common.model.TemperatureReadout;
 import java.awt.Font;
 import java.util.Collections;
 import java.util.HashMap;
@@ -26,16 +28,18 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
-import org.glassfish.jersey.SslConfigurator;
+import org.glassfish.grizzly.ssl.SSLContextConfigurator;
+import org.glassfish.grizzly.ssl.SSLContextConfigurator.GenericStoreException;
 
 public class ConsumerMain {
 
   private static boolean isSecure;
   private static String orchestratorUrl;
-  private static final TypeSafeProperties props = Utility.getProp("app.properties");
+  private static TypeSafeProperties props = Utility.getProp();
+  private static final String consumerSystemName = props.getProperty("consumer_system_name");
 
-  public static void main(String[] args) {
-    //Prints the working directory for extra information. Working directory should always contain a config folder with the app.properties file!
+  private ConsumerMain(String[] args) {
+    //Prints the working directory for extra information. Working directory should always contain a config folder with the app.conf file!
     System.out.println("Working directory: " + System.getProperty("user.dir"));
 
     //Compile the URL for the orchestration request.
@@ -51,22 +55,30 @@ public class ConsumerMain {
     String providerUrl = sendOrchestrationRequest(srf);
 
     //Connect to the provider, consuming its service - THIS METHOD SHOULD BE MODIFIED ACCORDING TO YOUR USE CASE
-    consumeService(providerUrl);
+    double temperature = consumeService(providerUrl);
 
     //Printing out the elapsed time during the orchestration and service consumption
     long endTime = System.currentTimeMillis();
     System.out.println("Orchestration and Service consumption response time: " + Long.toString(endTime - startTime));
+    //Show a message dialog with the response from the service provider
+    JLabel label = new JLabel("The indoor temperature is " + temperature + " degrees celsius.");
+    label.setFont(new Font("Arial", Font.BOLD, 18));
+    JOptionPane.showMessageDialog(null, label, "Provider Response", JOptionPane.INFORMATION_MESSAGE);
+  }
+
+  public static void main(String[] args) {
+    new ConsumerMain(args);
   }
 
   //Compiles the payload for the orchestration request
-  private static ServiceRequestForm compileSRF() {
+  private ServiceRequestForm compileSRF() {
     /*
       ArrowheadSystem: systemName, (address, port, authenticationInfo)
       Since this Consumer skeleton will not receive HTTP requests (does not provide any services on its own),
       the address, port and authenticationInfo fields can be set to anything.
       SystemName can be an arbitrarily chosen name, which makes sense for the use case.
      */
-    ArrowheadSystem consumer = new ArrowheadSystem("client1", "localhost", 0, "null");
+    ArrowheadSystem consumer = new ArrowheadSystem(consumerSystemName, "localhost", 8080, "null");
 
     //You can put any additional metadata you look for in a Service here (key-value pairs)
     Map<String, String> metadata = new HashMap<>();
@@ -80,7 +92,7 @@ public class ConsumerMain {
       Interfaces: supported message formats (e.g. JSON, XML, JSON-SenML), a potential provider has to have at least 1 match,
       so the communication between consumer and provider can be facilitated.
      */
-    ArrowheadService service = new ArrowheadService("IndoorTemperature", Collections.singletonList("json"), metadata);
+    ArrowheadService service = new ArrowheadService("IndoorTemperature", Collections.singleton("json"), metadata);
 
     //Some of the orchestrationFlags the consumer can use, to influence the orchestration process
     Map<String, Boolean> orchestrationFlags = new HashMap<>();
@@ -99,7 +111,7 @@ public class ConsumerMain {
     return srf;
   }
 
-  private static void consumeService(String providerUrl) {
+  private double consumeService(String providerUrl) {
     /*
       Sending request to the provider, to the acquired URL. The method type and payload should be known beforehand.
       If needed, compile the request payload here, before sending the request.
@@ -122,11 +134,10 @@ public class ConsumerMain {
     }
     if (readout.getE().get(0) == null) {
       System.out.println("Provider did not send any MeasurementEntry.");
+      return -1;
     } else {
       System.out.println("The indoor temperature is " + readout.getE().get(0).getV() + " degrees celsius.");
-      JLabel label = new JLabel("The indoor temperature is " + readout.getE().get(0).getV() + " degrees celsius.");
-      label.setFont(new Font("Arial", Font.BOLD, 18));
-      JOptionPane.showMessageDialog(null, label,"Provider Response", JOptionPane.INFORMATION_MESSAGE);
+      return readout.getE().get(0).getV();
     }
   }
 
@@ -136,8 +147,8 @@ public class ConsumerMain {
       Methods that do not need to be modified ↓
    */
 
-  //DO NOT MODIFY - Gets the correct URL where the orchestration requests needs to be sent (from app.properties config file + command line argument)
-  private static void getOrchestratorUrl(String[] args) {
+  //DO NOT MODIFY - Gets the correct URL where the orchestration requests needs to be sent (from app.conf config file + command line argument)
+  private void getOrchestratorUrl(String[] args) {
     String orchAddress = props.getProperty("orch_address", "0.0.0.0");
     int orchInsecurePort = props.getIntProperty("orch_insecure_port", 8440);
     int orchSecurePort = props.getIntProperty("orch_secure_port", 8441);
@@ -145,17 +156,29 @@ public class ConsumerMain {
     for (String arg : args) {
       if (arg.equals("-tls")) {
         isSecure = true;
-        SslConfigurator sslConfig = SslConfigurator.newInstance().trustStoreFile(props.getProperty("truststore"))
-                                                   .trustStorePassword(props.getProperty("truststorepass"))
-                                                   .keyStoreFile(props.getProperty("keystore")).keyStorePassword(props.getProperty("keystorepass"))
-                                                   .keyPassword(props.getProperty("keypass"));
-        SSLContext sslContext = sslConfig.createSSLContext();
-        Utility.setSSLContext(sslContext);
+        SSLContextConfigurator sslCon = new SSLContextConfigurator();
+        sslCon.setKeyStoreFile(props.getProperty("keystore"));
+        sslCon.setKeyStorePass(props.getProperty("keystorepass"));
+        sslCon.setKeyPass(props.getProperty("keypass"));
+        sslCon.setTrustStoreFile(props.getProperty("truststore"));
+        sslCon.setTrustStorePass(props.getProperty("truststorepass"));
+
+        try {
+          SSLContext sslContext = sslCon.createSSLContext(true);
+          Utility.setSSLContext(sslContext);
+        } catch (GenericStoreException e) {
+          System.out.println("Provided SSLContext is not valid, moving to certificate bootstrapping.");
+          e.printStackTrace();
+          sslCon = CertificateBootstrapper.bootstrap(ClientType.CONSUMER, consumerSystemName);
+          props = Utility.getProp();
+          Utility.setSSLContext(sslCon.createSSLContext(true));
+        }
         break;
       }
     }
 
     if (isSecure) {
+      Utility.checkProperties(props.stringPropertyNames(), ClientType.CONSUMER.getSecureMandatoryFields());
       orchestratorUrl = Utility.getUri(orchAddress, orchSecurePort, "orchestrator/orchestration", true, false);
     } else {
       orchestratorUrl = Utility.getUri(orchAddress, orchInsecurePort, "orchestrator/orchestration", false, false);
@@ -164,7 +187,7 @@ public class ConsumerMain {
 
   /* NO NEED TO MODIFY (for basic functionality)
      Sends the orchestration request to the Orchestrator, and compiles the URL for the first provider received from the OrchestrationResponse */
-  private static String sendOrchestrationRequest(ServiceRequestForm srf) {
+  private String sendOrchestrationRequest(ServiceRequestForm srf) {
     //Sending a POST request to the orchestrator (URL, method, payload)
     Response postResponse = Utility.sendRequest(orchestratorUrl, "POST", srf);
     //Parsing the orchestrator response
@@ -182,7 +205,7 @@ public class ConsumerMain {
     if (serviceURI != null) {
       ub.path(serviceURI);
     }
-    if (provider.getPort() > 0) {
+    if (provider.getPort() != null && provider.getPort() > 0) {
       ub.port(provider.getPort());
     }
     if (orchResponse.getResponse().get(0).getService().getServiceMetadata().containsKey("security")) {

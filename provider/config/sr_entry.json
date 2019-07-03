@@ -13,8 +13,8 @@
     "address": "0.0.0.0",
     "port": 8460
   },
-  "port": 8460,
-  "version": 1,
-  "UDP": false,
-  "ttl": 0
+  "serviceUri": "temperature",
+  "udp": false,
+  "endOfValidity": "2020-01-01T00:00:00.000",
+  "version": 1
 }

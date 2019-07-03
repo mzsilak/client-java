@@ -9,17 +9,17 @@
 
 package eu.arrowhead.client.provider;
 
-import eu.arrowhead.client.common.can_be_modified.misc.ClientType;
-import eu.arrowhead.client.common.no_need_to_modify.ArrowheadClientMain;
-import eu.arrowhead.client.common.no_need_to_modify.Utility;
-import eu.arrowhead.client.common.no_need_to_modify.exception.ArrowheadException;
-import eu.arrowhead.client.common.no_need_to_modify.exception.ExceptionType;
-import eu.arrowhead.client.common.no_need_to_modify.misc.SecurityUtils;
-import eu.arrowhead.client.common.no_need_to_modify.model.ArrowheadService;
-import eu.arrowhead.client.common.no_need_to_modify.model.ArrowheadSystem;
-import eu.arrowhead.client.common.no_need_to_modify.model.IntraCloudAuthEntry;
-import eu.arrowhead.client.common.no_need_to_modify.model.OrchestrationStore;
-import eu.arrowhead.client.common.no_need_to_modify.model.ServiceRegistryEntry;
+import eu.arrowhead.client.common.ArrowheadClientMain;
+import eu.arrowhead.client.common.Utility;
+import eu.arrowhead.client.common.exception.ArrowheadException;
+import eu.arrowhead.client.common.exception.ExceptionType;
+import eu.arrowhead.client.common.misc.ClientType;
+import eu.arrowhead.client.common.misc.SecurityUtils;
+import eu.arrowhead.client.common.model.ArrowheadService;
+import eu.arrowhead.client.common.model.ArrowheadSystem;
+import eu.arrowhead.client.common.model.IntraCloudAuthEntry;
+import eu.arrowhead.client.common.model.OrchestrationStore;
+import eu.arrowhead.client.common.model.ServiceRegistryEntry;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.KeyStore;
@@ -46,6 +46,7 @@ import javax.ws.rs.core.UriBuilder;
  */
 public class FullProviderMain extends ArrowheadClientMain {
 
+  static String customResponsePayload;
   static PublicKey authorizationKey;
   static PrivateKey privateKey;
 
@@ -98,6 +99,10 @@ public class FullProviderMain extends ArrowheadClientMain {
       registerToStore();
     }
 
+    if (props.getBooleanProperty("payload_from_file", false)) {
+      customResponsePayload = props.getProperty("custom_payload");
+    }
+
     listenForInput();
   }
 
@@ -112,11 +117,16 @@ public class FullProviderMain extends ArrowheadClientMain {
     privateKey = SecurityUtils.getPrivateKey(keyStore, keystorePass);
 
     //Load the Authorization Core System public key
-    String authCertPath = props.getProperty("authorization_cert");
-    KeyStore authKeyStore = SecurityUtils.createKeyStoreFromCert(authCertPath);
-    X509Certificate authCert = SecurityUtils.getFirstCertFromKeyStore(authKeyStore);
-    authorizationKey = authCert.getPublicKey();
-    System.out.println("Authorization CN: " + SecurityUtils.getCertCNFromSubject(authCert.getSubjectDN().getName()));
+    String authPublicKeyPath = props.getProperty("authorization_public_key");
+    //Supporting the old format used previously: crt file containing the full certificate
+    if (authPublicKeyPath.endsWith("crt")) {
+      KeyStore authKeyStore = SecurityUtils.createKeyStoreFromCert(authPublicKeyPath);
+      X509Certificate authCert = SecurityUtils.getFirstCertFromKeyStore(authKeyStore);
+      authorizationKey = authCert.getPublicKey();
+    } else { //This is just a PEM encoded public key
+      authorizationKey = SecurityUtils.getPublicKey(authPublicKeyPath, true);
+    }
+
     System.out.println("Authorization System PublicKey Base64: " + Base64.getEncoder().encodeToString(authorizationKey.getEncoded()));
   }
 
@@ -145,8 +155,11 @@ public class FullProviderMain extends ArrowheadClientMain {
     } else {
       String serviceDef = props.getProperty("service_name");
       String serviceUri = props.getProperty("service_uri");
+      if (!serviceUri.equals(TemperatureResource.SERVICE_URI)) {
+        System.out.println("WARNING: Service URI in config file does not match REST sub-path.");
+      }
       String interfaceList = props.getProperty("interfaces");
-      List<String> interfaces = new ArrayList<>();
+      Set<String> interfaces = new HashSet<>();
       if (interfaceList != null && !interfaceList.isEmpty()) {
         interfaces.addAll(Arrays.asList(interfaceList.replaceAll("\\s+", "").split(",")));
       }
@@ -184,7 +197,7 @@ public class FullProviderMain extends ArrowheadClientMain {
         String consumerName = props.getProperty("consumer_name");
         String consumerAddress = props.getProperty("consumer_address");
         String consumerPK = props.getProperty("consumer_public_key");
-        consumer = new ArrowheadSystem(consumerName, consumerAddress, 0, consumerPK);
+        consumer = new ArrowheadSystem(consumerName, consumerAddress, 8080, consumerPK);
       }
 
       srEntry = new ServiceRegistryEntry(service, provider, serviceUri);
@@ -227,16 +240,27 @@ public class FullProviderMain extends ArrowheadClientMain {
     String authAddress = props.getProperty("auth_address", "0.0.0.0");
     int authPort = isSecure ? props.getIntProperty("auth_secure_port", 8445) : props.getIntProperty("auth_insecure_port", 8444);
     String authUri = Utility.getUri(authAddress, authPort, "authorization/mgmt/intracloud", isSecure, false);
-    Utility.sendRequest(authUri, "POST", authEntry);
-    System.out.println("Authorization registration is successful!");
+    try {
+      Utility.sendRequest(authUri, "POST", authEntry);
+      System.out.println("Authorization registration is successful!");
+    } catch (ArrowheadException e) {
+      e.printStackTrace();
+      System.out.println("Authorization registration failed!");
+    }
+
   }
 
   private void registerToStore() {
     String orchAddress = props.getProperty("orch_address", "0.0.0.0");
     int orchPort = props.getIntProperty("orch_port", 8440);
     String orchUri = Utility.getUri(orchAddress, orchPort, "orchestrator/mgmt/store", false, false);
-    Utility.sendRequest(orchUri, "POST", storeEntry);
-    System.out.println("Store registration is successful!");
+    try {
+      Utility.sendRequest(orchUri, "POST", storeEntry);
+      System.out.println("Store registration is successful!");
+    } catch (ArrowheadException e) {
+      e.printStackTrace();
+      System.out.println("Store registration failed!");
+    }
   }
 
 }

@@ -1,13 +1,13 @@
 package eu.arrowhead.client.provider;
 
-import eu.arrowhead.client.common.can_be_modified.misc.ClientType;
-import eu.arrowhead.client.common.no_need_to_modify.ArrowheadClientMain;
-import eu.arrowhead.client.common.no_need_to_modify.Utility;
-import eu.arrowhead.client.common.no_need_to_modify.exception.ArrowheadException;
-import eu.arrowhead.client.common.no_need_to_modify.exception.ExceptionType;
-import eu.arrowhead.client.common.no_need_to_modify.model.ArrowheadService;
-import eu.arrowhead.client.common.no_need_to_modify.model.ArrowheadSystem;
-import eu.arrowhead.client.common.no_need_to_modify.model.ServiceRegistryEntry;
+import eu.arrowhead.client.common.ArrowheadClientMain;
+import eu.arrowhead.client.common.Utility;
+import eu.arrowhead.client.common.exception.ArrowheadException;
+import eu.arrowhead.client.common.exception.ExceptionType;
+import eu.arrowhead.client.common.misc.ClientType;
+import eu.arrowhead.client.common.model.ArrowheadService;
+import eu.arrowhead.client.common.model.ArrowheadSystem;
+import eu.arrowhead.client.common.model.ServiceRegistryEntry;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -31,7 +31,7 @@ public class BasicProviderMain extends ArrowheadClientMain {
 
   public static void main(String[] args) {
     //Remove the command line argument for secure mode, if present, since the Basic Provider only operates in insecure mode.
-    List<String> list = new ArrayList<String>(Arrays.asList(args));
+    List<String> list = new ArrayList<>(Arrays.asList(args));
     list.remove("-tls");
     args = list.toArray(new String[0]);
     new BasicProviderMain(args);
@@ -66,7 +66,7 @@ public class BasicProviderMain extends ArrowheadClientMain {
     String serviceDef = props.getProperty("service_name");
     String serviceUri = props.getProperty("service_uri");
     String interfaceList = props.getProperty("interfaces");
-    List<String> interfaces = new ArrayList<>();
+    Set<String> interfaces = new HashSet<>();
     if (interfaceList != null && !interfaceList.isEmpty()) {
       //Interfaces are read from a comma separated list
       interfaces.addAll(Arrays.asList(interfaceList.replaceAll("\\s+", "").split(",")));

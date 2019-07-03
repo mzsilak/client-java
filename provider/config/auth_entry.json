@@ -2,7 +2,7 @@
   "consumer": {
     "systemName": "client1",
     "address": "localhost",
-    "port": 0,
+    "port": 8080,
     "authenticationInfo": "null"
   },
   "providerList": [

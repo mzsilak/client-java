@@ -1,6 +1,11 @@
 package eu.arrowhead.client.provider;
 
-import eu.arrowhead.client.common.can_be_modified.model.Car;
+import eu.arrowhead.client.common.exception.DataNotFoundException;
+import eu.arrowhead.client.common.model.Car;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -25,28 +30,64 @@ import javax.ws.rs.core.Response.Status;
 @Produces(MediaType.APPLICATION_JSON)
 public class RestResource {
 
+  //In-memory mocked database
+  private static Integer idCounter = 0;
+  private static final ConcurrentHashMap<Integer, Car> cars = new ConcurrentHashMap<>();
+
+
   @GET
   @Produces(MediaType.TEXT_PLAIN) //individual methods can override class level annotations
   public String simpleGetRequest() {
-    return "This is a REST resource!";
+    return "This is an example REST resource!";
   }
 
   /*
     GET requests are usually used to get a resource from the database, often identified by a unique ID.
-    QueryParameters are optional in Jersey, the color variable will be null if the client did not specify it.
-    Full url: http://<server_address>:<server_port>/example/cars/BMW?color=blue
+    Example URL: http://<server_address>:<server_port>/example/cars/5
    */
   @GET
-  @Path("cars/{brand}")
-  public Response getCarResource(@PathParam("brand") String brand, @QueryParam("color") String color) {
-    //Get a Car with a certain brand and color from the database, and return it to the client
-
-    Car car = new Car(brand, color);
-    //Response contains the status code, and the response entity
-    return Response.status(Status.OK).entity(car).build();
+  @Path("cars/{id}")
+  public Response getCarById(@PathParam("id") Integer id) {
+    Car retrievedCar = cars.get(id);
+    if (retrievedCar != null) {
+      return Response.status(Status.OK).entity(retrievedCar).build();
+    } else {
+      return Response.status(Status.OK).build();
+    }
   }
 
-  //GetAllCars method
+  /*
+    Get all cars, optional filter parameters are the brand and color of the cars.
+    QueryParameters are optional in Jersey, for example brand will be null if not specified.
+    Example URL: http://<server_address>:<server_port>/example/cars?brand=Volvo&color=red
+   */
+  @GET
+  @Path("cars")
+  public Response getCars(@QueryParam("brand") String brand, @QueryParam("color") String color) {
+    //Get all the cars in a list
+    List<Car> returnedCars = new ArrayList<>();
+    for (Entry<Integer, Car> mapEntry : cars.entrySet()) {
+      returnedCars.add(mapEntry.getValue());
+    }
+
+    //Filter the list based on the specified brand and color
+    if (brand != null) {
+      returnedCars.removeIf(car -> !brand.equals(car.getBrand()));
+    }
+    if (color != null) {
+      returnedCars.removeIf(car -> !color.equals(car.getColor()));
+    }
+
+    //Response contains the status code, and the response entity
+    return Response.status(Status.OK).entity(returnedCars).build();
+  }
+
+  //Return the complete Map with IDs included
+  @GET
+  @Path("raw")
+  public Response getAll() {
+    return Response.status(Status.OK).entity(cars).build();
+  }
 
   /*
      POST requests are usually for creating/saving new resources. The resource is in the payload of the request, which will be
@@ -55,7 +96,10 @@ public class RestResource {
   @POST
   @Path("cars")
   public Response createCar(Car car) {
-    //Save the car instance to the database, and return the saved instance to the client
+    //Save the car instance to the database
+    cars.put(idCounter, car);
+    //Increment the ID for the next call of this method
+    idCounter++;
     return Response.status(Status.CREATED).entity(car).build();
   }
 
@@ -66,13 +110,17 @@ public class RestResource {
    */
   @PUT
   @Path("cars/{id}")
-  public Response updateCar(@PathParam("id") Long id, Car car) {
-    Car carFromTheDatabase = new Car("Toyota", "White");
-    carFromTheDatabase.setBrand(car.getBrand());
-    carFromTheDatabase.setColor(car.getColor());
+  public Response updateCar(@PathParam("id") Integer id, Car updatedCar) {
+    Car carFromTheDatabase = cars.get(id);
+    //Throw an exception if the car with the specified ID does not exist
+    if (carFromTheDatabase != null) {
+      throw new DataNotFoundException("Car with id " + id + " not found in the database!");
+    }
+    //Update the car
+    cars.put(id, updatedCar);
 
-    //Save the modified resource, and return it to the user
-    return Response.status(Status.ACCEPTED).entity(carFromTheDatabase).build();
+    //Return a response with Accepted status code
+    return Response.status(Status.ACCEPTED).entity(updatedCar).build();
   }
 
   /*
@@ -80,8 +128,8 @@ public class RestResource {
    */
   @DELETE
   @Path("cars/{id}")
-  public Response deleteCar(@PathParam("id") Long id) {
-    //Get the car identified by the ID from the database, and delete it, respond with HTTP_OK if successful
+  public Response deleteCar(@PathParam("id") Integer id) {
+    cars.remove(id);
     return Response.ok().build();
   }
 

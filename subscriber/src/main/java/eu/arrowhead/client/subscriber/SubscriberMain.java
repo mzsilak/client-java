@@ -9,11 +9,11 @@
 
 package eu.arrowhead.client.subscriber;
 
-import eu.arrowhead.client.common.can_be_modified.misc.ClientType;
-import eu.arrowhead.client.common.no_need_to_modify.ArrowheadClientMain;
-import eu.arrowhead.client.common.no_need_to_modify.Utility;
-import eu.arrowhead.client.common.no_need_to_modify.model.ArrowheadSystem;
-import eu.arrowhead.client.common.no_need_to_modify.model.EventFilter;
+import eu.arrowhead.client.common.ArrowheadClientMain;
+import eu.arrowhead.client.common.Utility;
+import eu.arrowhead.client.common.misc.ClientType;
+import eu.arrowhead.client.common.model.ArrowheadSystem;
+import eu.arrowhead.client.common.model.EventFilter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import javax.ws.rs.core.UriBuilder;
+import org.apache.log4j.PropertyConfigurator;
 
 //This class extends ArrowheadClientMain, which is responsible for starting and stopping the web server
 //The subscriber uses a web server in order to provide an interface for the Event Handler to provide events with the type the subscriber asked for
@@ -35,6 +36,9 @@ public class SubscriberMain extends ArrowheadClientMain {
     Set<Class<?>> classes = new HashSet<>(Collections.singleton(SubscriberResource.class));
     String[] packages = {"eu.arrowhead.client.common"};
     init(ClientType.SUBSCRIBER, args, classes, packages);
+
+    //Log4j configuration
+    PropertyConfigurator.configure(props);
 
     //Read in the Event Handler address related properties, create the full URL with the getUri() utility method
     String ehAddress = props.getProperty("eh_address", "0.0.0.0");

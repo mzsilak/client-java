@@ -23,7 +23,7 @@
   <properties>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
-    <maven.compiler.version>3.1</maven.compiler.version>
+    <maven.compiler.version>3.8.0</maven.compiler.version>
     <maven.dependency.version>2.5.1</maven.dependency.version>
     <maven.jar.version>3.0.2</maven.jar.version>
     <maven.resources.version>2.7</maven.resources.version>
@@ -36,7 +36,11 @@
       <groupId>eu.arrowhead</groupId>
       <artifactId>client-common</artifactId>
     </dependency>
-
+    <dependency>
+      <groupId>eu.arrowhead</groupId>
+      <artifactId>demo-common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -76,7 +80,7 @@
             </manifestEntries>
             <manifest>
               <addClasspath>true</addClasspath>
-              <mainClass>eu.arrowhead.client.consumer.ConsumerMain</mainClass>
+              <mainClass>eu.arrowhead.client.consumer.BlueLedConsumer</mainClass>
               <classpathPrefix>lib/</classpathPrefix>
             </manifest>
           </archive>

@@ -14,7 +14,7 @@ Short description of the available command line arguments for this Arrowhead Pro
 
 4) -ff (from file)
   This tells the program that instead of building the JSON payloads for its request from scratch, use the provided JSON files (the path of where to
-  find these files has to be set in the app.properties config file)
+  find these files has to be set in the config file)
 
 5) -auth
   Send an IntraCloudAuth request to the Authorization Core System when starting. This feature can only work in secure mode, if the Authorization
