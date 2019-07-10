@@ -16,31 +16,31 @@ public class DnsException extends ArrowheadException {
 
   public DnsException(final String msg, final int errorCode, final String origin, final Throwable cause) {
     super(msg, errorCode, origin, cause);
-    this.setExceptionType(ExceptionType.DNSSD);
+    this.setExceptionType(ExceptionType.DNS_SD);
   }
 
   public DnsException(final String msg, final int errorCode, final String origin) {
     super(msg, errorCode, origin);
-    this.setExceptionType(ExceptionType.DNSSD);
+    this.setExceptionType(ExceptionType.DNS_SD);
   }
 
   public DnsException(String msg, int errorCode, Throwable cause) {
     super(msg, errorCode, cause);
-    this.setExceptionType(ExceptionType.DNSSD);
+    this.setExceptionType(ExceptionType.DNS_SD);
   }
 
   public DnsException(String msg, int errorCode) {
     super(msg, errorCode);
-    this.setExceptionType(ExceptionType.DNSSD);
+    this.setExceptionType(ExceptionType.DNS_SD);
   }
 
   public DnsException(String msg, Throwable cause) {
     super(msg, cause);
-    this.setExceptionType(ExceptionType.DNSSD);
+    this.setExceptionType(ExceptionType.DNS_SD);
   }
 
   public DnsException(String msg) {
     super(msg);
-    this.setExceptionType(ExceptionType.DNSSD);
+    this.setExceptionType(ExceptionType.DNS_SD);
   }
 }

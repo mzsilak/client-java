@@ -19,6 +19,7 @@ import eu.arrowhead.client.common.exception.DuplicateEntryException;
 import eu.arrowhead.client.common.exception.ErrorMessage;
 import eu.arrowhead.client.common.exception.UnavailableServerException;
 import eu.arrowhead.client.common.misc.JacksonJsonProviderAtRest;
+import eu.arrowhead.client.common.misc.PasswordGenerator;
 import eu.arrowhead.client.common.misc.TypeSafeProperties;
 import java.io.BufferedReader;
 import java.io.File;
@@ -28,8 +29,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ServiceConfigurationError;
@@ -60,6 +66,11 @@ public final class Utility {
     // Decide whether to allow the connection...
     return true;
   };
+
+  private static final String DEFAULT_CONF = "default.conf";
+  private static final String DEFAULT_CONF_DIR = "config" + File.separator + "default.conf";
+  private static final String APP_CONF = "app.conf";
+  private static final String APP_CONF_DIR = "config" + File.separator + "app.conf";
 
 
   private Utility() throws AssertionError {
@@ -167,6 +178,8 @@ public final class Utility {
           throw new ArrowheadException(errorMessage.getErrorMessage(), errorMessage.getErrorCode());
         case AUTH:
           throw new AuthException(errorMessage.getErrorMessage(), errorMessage.getErrorCode());
+        case BAD_MEDIA_TYPE:
+          throw new ArrowheadException(errorMessage.getErrorMessage(), errorMessage.getErrorCode());
         case BAD_METHOD:
           throw new ArrowheadException(errorMessage.getErrorMessage(), errorMessage.getErrorCode());
         case BAD_PAYLOAD:
@@ -175,7 +188,7 @@ public final class Utility {
           throw new ArrowheadException(errorMessage.getErrorMessage(), errorMessage.getErrorCode());
         case DATA_NOT_FOUND:
           throw new DataNotFoundException(errorMessage.getErrorMessage(), errorMessage.getErrorCode());
-        case DNSSD:
+        case DNS_SD:
           throw new DnsException(errorMessage.getErrorMessage(), errorMessage.getErrorCode(), errorMessage.getOrigin());
         case DUPLICATE_ENTRY:
           throw new DuplicateEntryException(errorMessage.getErrorMessage(), errorMessage.getErrorCode());
@@ -232,7 +245,7 @@ public final class Utility {
   public static String getRequestPayload(InputStream is) {
     StringBuilder sb = new StringBuilder();
     String line;
-    try (BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"))) {
+    try (BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
       while ((line = br.readLine()) != null) {
         sb.append(line);
       }
@@ -286,7 +299,7 @@ public final class Utility {
       File file = new File(pathName);
       FileInputStream is = new FileInputStream(file);
 
-      BufferedReader br = new BufferedReader(new InputStreamReader(is, "utf-8"));
+      BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
       sb = new StringBuilder();
       String line;
       while ((line = br.readLine()) != null) {
@@ -319,7 +332,31 @@ public final class Utility {
     return prop;
   }
 
-  static void checkProperties(Set<String> propertyNames, List<String> mandatoryProperties) {
+  public static TypeSafeProperties getProp() {
+    TypeSafeProperties prop = new TypeSafeProperties();
+
+    try {
+      if (Files.isReadable(Paths.get(DEFAULT_CONF))) {
+        prop.load(new FileInputStream(new File(DEFAULT_CONF)));
+      } else if (Files.isReadable(Paths.get(DEFAULT_CONF_DIR))) {
+        prop.load(new FileInputStream(new File(DEFAULT_CONF_DIR)));
+      } else {
+        throw new ServiceConfigurationError("default.conf file not found in the working directory! (" + System.getProperty("user.dir") + ")");
+      }
+
+      if (Files.isReadable(Paths.get(APP_CONF))) {
+        prop.load(new FileInputStream(new File(APP_CONF)));
+      } else if (Files.isReadable(Paths.get(APP_CONF_DIR))) {
+        prop.load(new FileInputStream(new File(APP_CONF_DIR)));
+      }
+    } catch (IOException e) {
+      throw new AssertionError("File loading failed...", e);
+    }
+
+    return prop;
+  }
+
+  public static void checkProperties(Set<String> propertyNames, List<String> mandatoryProperties) {
     if (mandatoryProperties == null || mandatoryProperties.isEmpty()) {
       return;
     }
@@ -327,8 +364,36 @@ public final class Utility {
     List<String> properties = new ArrayList<>(mandatoryProperties);
     if (!propertyNames.containsAll(mandatoryProperties)) {
       properties.removeIf(propertyNames::contains);
-      throw new ServiceConfigurationError("Missing field(s) from app.properties file: " + properties.toString());
+      throw new ServiceConfigurationError("Missing field(s) from config file: " + properties.toString());
     }
   }
 
+  public static boolean isHostAvailable(String host, int port, int timeout) {
+    try (Socket socket = new Socket()) {
+      socket.connect(new InetSocketAddress(host, port), timeout);
+      return true;
+    } catch (IOException e) {
+      return false; // Either timeout or unreachable or failed DNS lookup.
+    }
+  }
+
+  public static String getRandomPassword() {
+    PasswordGenerator generator = new PasswordGenerator.Builder().useDigits(true).useLower(true).useUpper(true).usePunctuation(false).build();
+    return generator.generate(12);
+  }
+
+  public static boolean isBlank(final String str) {
+    return (str == null || "".equals(str.trim()));
+  }
+
+  @SuppressWarnings("WeakerAccess")
+  public static Throwable getExceptionRootCause(Throwable e) {
+    Throwable cause = null;
+    Throwable result = e;
+
+    while (null != (cause = result.getCause()) && (result != cause)) {
+      result = cause;
+    }
+    return result;
+  }
 }

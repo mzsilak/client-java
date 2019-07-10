@@ -9,6 +9,9 @@
 
 package eu.arrowhead.client.common.model;
 
+import java.util.Objects;
+import org.glassfish.jersey.internal.guava.MoreObjects;
+
 //Sample model class to demonstrate REST capabilities in the RestResource class
 public class Car {
 
@@ -42,4 +45,25 @@ public class Car {
     this.color = color;
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof Car)) {
+      return false;
+    }
+    Car car = (Car) o;
+    return Objects.equals(brand, car.brand) && Objects.equals(color, car.color);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(brand, color);
+  }
+
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this).add("brand", brand).add("color", color).toString();
+  }
 }

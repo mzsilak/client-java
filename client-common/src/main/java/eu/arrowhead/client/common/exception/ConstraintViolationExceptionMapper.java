@@ -28,7 +28,7 @@ public class ConstraintViolationExceptionMapper implements ExceptionMapper<Const
     int errorCode = 404; //Bad Request
     String origin = requestContext.get() != null ? requestContext.get().getAbsolutePath().toString() : "unknown";
 
-    ErrorMessage errorMessage = new ErrorMessage(exception.getMessage(), errorCode, ExceptionType.VALIDATION, origin);
+    ErrorMessage errorMessage = new ErrorMessage(exception.getMessage(), errorCode, ExceptionType.BAD_PAYLOAD, origin);
     return Response.status(errorCode).entity(errorMessage).header("Content-type", "application/json").build();
   }
 }

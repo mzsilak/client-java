@@ -9,7 +9,7 @@
 
 package eu.arrowhead.client.common.model;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -21,8 +21,8 @@ public class EventFilter {
   private String eventType;
   private ArrowheadSystem consumer;
   private Set<ArrowheadSystem> sources = new HashSet<>();
-  private LocalDateTime startDate;
-  private LocalDateTime endDate;
+  private ZonedDateTime startDate;
+  private ZonedDateTime endDate;
   private Map<String, String> filterMetadata = new HashMap<>();
   private String notifyUri;
   private boolean matchMetadata;
@@ -30,7 +30,7 @@ public class EventFilter {
   public EventFilter() {
   }
 
-  public EventFilter(String eventType, ArrowheadSystem consumer, Set<ArrowheadSystem> sources, LocalDateTime startDate, LocalDateTime endDate,
+  public EventFilter(String eventType, ArrowheadSystem consumer, Set<ArrowheadSystem> sources, ZonedDateTime startDate, ZonedDateTime endDate,
                      Map<String, String> filterMetadata, String notifyUri, boolean matchMetadata) {
     this.eventType = eventType;
     this.consumer = consumer;
@@ -80,19 +80,19 @@ public class EventFilter {
     this.sources = sources;
   }
 
-  public LocalDateTime getStartDate() {
+  public ZonedDateTime getStartDate() {
     return startDate;
   }
 
-  public void setStartDate(LocalDateTime startDate) {
+  public void setStartDate(ZonedDateTime startDate) {
     this.startDate = startDate;
   }
 
-  public LocalDateTime getEndDate() {
+  public ZonedDateTime getEndDate() {
     return endDate;
   }
 
-  public void setEndDate(LocalDateTime endDate) {
+  public void setEndDate(ZonedDateTime endDate) {
     this.endDate = endDate;
   }
 

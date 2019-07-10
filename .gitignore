@@ -1,21 +1,31 @@
-/.idea/
+### Eclipse/STS ###
+*.apt_generated
+*.classpath
+*.factorypath
+*.project
+*.settings
+*.springBeans
+*.sts4-cache
 
-/client-common/client-common.iml
+### IntelliJ IDEA ###
+.idea/*.xml
+.idea/libraries
+.idea/markdown-navigator
+*.iws
+*.iml
+*.ipr
 
-/consumer/config/app.properties
-/consumer/target/
-/consumer/consumer.iml
+### NetBeans ###
+/nbproject/private/
+/build/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
 
-/provider/config/app.properties
-/provider/target/
-/provider/provider.iml
-
-/publisher/config/app.properties
-/publisher/target/
-/publisher/publisher.iml
-
-/subscriber/config/app.properties
-/subscriber/target/
-/subscriber/subscriber.iml
-
-/arrowheadclient.iml
+### General ###
+/config/
+*.properties
+*/target
+*app.conf
+*.mvn

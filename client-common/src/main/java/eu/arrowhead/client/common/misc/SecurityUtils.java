@@ -9,9 +9,13 @@
 
 package eu.arrowhead.client.common.misc;
 
+import eu.arrowhead.client.common.exception.ArrowheadException;
+import eu.arrowhead.client.common.exception.AuthException;
+import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyManagementException;
@@ -19,7 +23,9 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.Provider;
 import java.security.PublicKey;
+import java.security.Security;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
@@ -31,14 +37,29 @@ import java.util.Base64;
 import java.util.Enumeration;
 import java.util.NoSuchElementException;
 import java.util.ServiceConfigurationError;
+import java.util.regex.Pattern;
 import javax.naming.InvalidNameException;
 import javax.naming.ldap.LdapName;
 import javax.naming.ldap.Rdn;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
+@SuppressWarnings("unused")
 public final class SecurityUtils {
+
+  private static Provider securityProvider;
+
+  public static synchronized void addSecurityProvider() {
+    // Late creation of BouncyCastleProvider since it can be slow to load on a Raspberry Pi
+    if (securityProvider == null) {
+      securityProvider = new BouncyCastleProvider();
+    }
+    if (Security.getProvider(securityProvider.getName()) == null) {
+      Security.addProvider(securityProvider);
+    }
+  }
 
   public static KeyStore loadKeyStore(String filePath, String pass) {
     try {
@@ -202,21 +223,53 @@ public final class SecurityUtils {
     return sb.toString();
   }
 
-  public static PublicKey getPublicKey(String stringKey) throws InvalidKeySpecException {
-    byte[] byteKey = Base64.getDecoder().decode(stringKey);
-    X509EncodedKeySpec X509publicKey = new X509EncodedKeySpec(byteKey);
-    KeyFactory kf = null;
-    try {
-      kf = KeyFactory.getInstance("RSA");
-    } catch (NoSuchAlgorithmException e) {
-      e.printStackTrace();
+  /**
+   * Extract a public key either from a PEM encoded file or directly from the Base64 coded string.
+   *
+   * @param filePathOrEncodedKey either a file path for the PEM file or the Base64 encoded key
+   * @param isFilePath true if the first parameter is a file path
+   *
+   * @return the PublicKey
+   */
+  public static PublicKey getPublicKey(String filePathOrEncodedKey, boolean isFilePath) {
+    byte[] keyBytes;
+    if (isFilePath) {
+      keyBytes = loadPEM(filePathOrEncodedKey);
+    } else {
+      try {
+        keyBytes = Base64.getDecoder().decode(filePathOrEncodedKey);
+      } catch (IllegalArgumentException | NullPointerException e) {
+        throw new AuthException("Public key decoding failed! Caused by: " + e.getMessage(), e);
+      }
     }
-
-    // noinspection ConstantConditions
-    return kf.generatePublic(X509publicKey);
+    try {
+      KeyFactory kf = KeyFactory.getInstance("RSA");
+      return kf.generatePublic(new X509EncodedKeySpec(keyBytes));
+    } catch (NoSuchAlgorithmException e) {
+      throw new AssertionError("KeyFactory.getInstance(String) throws NoSuchAlgorithmException, code needs to be changed!", e);
+    } catch (InvalidKeySpecException e) {
+      throw new AuthException("PublicKey decoding failed due wrong input key", e);
+    }
   }
 
-  public static TrustManager[] createTrustManagers() {
+  public static byte[] loadPEM(String filePath) {
+    try (FileInputStream in = new FileInputStream(filePath)) {
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      byte[] buf = new byte[1024];
+      for (int read = 0; read != -1; read = in.read(buf)) {
+        baos.write(buf, 0, read);
+      }
+      String pem = new String(baos.toByteArray(), StandardCharsets.ISO_8859_1);
+      baos.close();
+      Pattern parse = Pattern.compile("(?m)(?s)^---*BEGIN.*---*$(.*)^---*END.*---*$.*");
+      String encoded = parse.matcher(pem).replaceFirst("$1");
+      return Base64.getMimeDecoder().decode(encoded);
+    } catch (IOException e) {
+      throw new ArrowheadException("IOException occurred during PEM file loading from " + filePath, e);
+    }
+  }
+
+  private static TrustManager[] createTrustManagers() {
     return new TrustManager[]{new X509TrustManager() {
 
       public X509Certificate[] getAcceptedIssuers() {

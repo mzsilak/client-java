@@ -15,7 +15,7 @@ import eu.arrowhead.client.common.misc.ClientType;
 import eu.arrowhead.client.common.model.ArrowheadSystem;
 import eu.arrowhead.client.common.model.Event;
 import eu.arrowhead.client.common.model.PublishEvent;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -57,7 +57,7 @@ public class PublisherMain extends ArrowheadClientMain {
 
     //Put together the event POJO and send the request to the Event Handler
     ArrowheadSystem source = new ArrowheadSystem(systemName, address, usedPort, base64PublicKey);
-    Event event = new Event(type, payload, LocalDateTime.now(), null);
+    Event event = new Event(type, payload, ZonedDateTime.now(), null);
     PublishEvent eventPublishing = new PublishEvent(source, event, "publisher/feedback");
     Utility.sendRequest(ehUri, "POST", eventPublishing);
     System.out.println("Event published to EH.");

@@ -14,11 +14,11 @@ import java.util.Arrays;
 import java.util.List;
 
 /* Enum for different client types, which store the ports they should start their web server on, and their properties,
-   which are mandatory to have in their app.properties file. The properties are checked at startup, to see if any mandatory one is missing.*/
+   which are mandatory to have in their config file. The properties are checked at startup, to see if any mandatory one is missing.*/
 public enum ClientType {
   CONSUMER(8080, 8080, null, Arrays.asList("keystore", "keystorepass", "keypass", "truststore", "truststorepass")),
   PROVIDER(8460, 8461, Arrays.asList("service_name", "service_uri", "interfaces", "metadata", "insecure_system_name"),
-           Arrays.asList("keystore", "keystorepass", "keypass", "truststore", "truststorepass", "authorization_cert", "secure_system_name")),
+           Arrays.asList("keystore", "keystorepass", "keypass", "truststore", "truststorepass", "authorization_public_key", "secure_system_name")),
   PUBLISHER(8462, 8463, Arrays.asList("event_type", "insecure_system_name"),
             Arrays.asList("keystore", "keystorepass", "keypass", "truststore", "truststorepass", "secure_system_name")),
   SUBSCRIBER(8464, 8465, Arrays.asList("event_types", "notify_uri", "insecure_system_name"),

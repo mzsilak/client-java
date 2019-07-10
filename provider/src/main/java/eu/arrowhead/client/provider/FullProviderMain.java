@@ -46,6 +46,7 @@ import javax.ws.rs.core.UriBuilder;
  */
 public class FullProviderMain extends ArrowheadClientMain {
 
+  static String customResponsePayload;
   static PublicKey authorizationKey;
   static PrivateKey privateKey;
 
@@ -64,7 +65,7 @@ public class FullProviderMain extends ArrowheadClientMain {
   }
 
   private FullProviderMain(String[] args) {
-    Set<Class<?>> classes = new HashSet<>(Arrays.asList(TemperatureResource.class, RestResource.class));
+    Set<Class<?>> classes = new HashSet<>(Arrays.asList(TemperatureResource.class, RestResource.class, RequestVerificationFilter.class));
     String[] packages = {"eu.arrowhead.client.common"};
     init(ClientType.PROVIDER, args, classes, packages);
 
@@ -98,6 +99,10 @@ public class FullProviderMain extends ArrowheadClientMain {
       registerToStore();
     }
 
+    if (props.getBooleanProperty("payload_from_file", false)) {
+      customResponsePayload = props.getProperty("custom_payload");
+    }
+
     listenForInput();
   }
 
@@ -112,11 +117,16 @@ public class FullProviderMain extends ArrowheadClientMain {
     privateKey = SecurityUtils.getPrivateKey(keyStore, keystorePass);
 
     //Load the Authorization Core System public key
-    String authCertPath = props.getProperty("authorization_cert");
-    KeyStore authKeyStore = SecurityUtils.createKeyStoreFromCert(authCertPath);
-    X509Certificate authCert = SecurityUtils.getFirstCertFromKeyStore(authKeyStore);
-    authorizationKey = authCert.getPublicKey();
-    System.out.println("Authorization CN: " + SecurityUtils.getCertCNFromSubject(authCert.getSubjectDN().getName()));
+    String authPublicKeyPath = props.getProperty("authorization_public_key");
+    //Supporting the old format used previously: crt file containing the full certificate
+    if (authPublicKeyPath.endsWith("crt")) {
+      KeyStore authKeyStore = SecurityUtils.createKeyStoreFromCert(authPublicKeyPath);
+      X509Certificate authCert = SecurityUtils.getFirstCertFromKeyStore(authKeyStore);
+      authorizationKey = authCert.getPublicKey();
+    } else { //This is just a PEM encoded public key
+      authorizationKey = SecurityUtils.getPublicKey(authPublicKeyPath, true);
+    }
+
     System.out.println("Authorization System PublicKey Base64: " + Base64.getEncoder().encodeToString(authorizationKey.getEncoded()));
   }
 
@@ -145,6 +155,9 @@ public class FullProviderMain extends ArrowheadClientMain {
     } else {
       String serviceDef = props.getProperty("service_name");
       String serviceUri = props.getProperty("service_uri");
+      if (!serviceUri.equals(TemperatureResource.SERVICE_URI)) {
+        System.out.println("WARNING: Service URI in config file does not match REST sub-path.");
+      }
       String interfaceList = props.getProperty("interfaces");
       Set<String> interfaces = new HashSet<>();
       if (interfaceList != null && !interfaceList.isEmpty()) {

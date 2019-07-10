@@ -9,6 +9,7 @@
 
 package eu.arrowhead.client.common;
 
+import eu.arrowhead.client.common.exception.ArrowheadException;
 import eu.arrowhead.client.common.exception.AuthException;
 import eu.arrowhead.client.common.misc.ClientType;
 import eu.arrowhead.client.common.misc.SecurityUtils;
@@ -26,10 +27,10 @@ import java.util.ServiceConfigurationError;
 import java.util.Set;
 import javax.net.ssl.SSLContext;
 import javax.ws.rs.ProcessingException;
-import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.ssl.SSLContextConfigurator;
+import org.glassfish.grizzly.ssl.SSLContextConfigurator.GenericStoreException;
 import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -38,7 +39,7 @@ import org.glassfish.jersey.server.ResourceConfig;
   Common base class for Client main classes.
   Functionalities:
     1) Read in basic command line arguments
-    2) Read in the contents of app.properties, check for missing mandatory values
+    2) Read in the contents of the config files (default + app), check for missing mandatory values
     3) Start an insecure/secure web server (this might be optional in the future)
     4) Listen for exit command + stop the web server
  */
@@ -48,10 +49,16 @@ public abstract class ArrowheadClientMain {
   protected String baseUri;
   protected String base64PublicKey;
   protected HttpServer server;
-  protected final TypeSafeProperties props = Utility.getProp("app.properties");
+  protected TypeSafeProperties props = Utility.getProp();
 
   private boolean daemon;
   private ClientType clientType;
+
+  {
+    if (props.containsKey("db_address") && props.containsKey("db_user") && props.containsKey("db_password")) {
+      DatabaseManager.init();
+    }
+  }
 
   protected void init(ClientType client, String[] args, Set<Class<?>> classes, String[] packages) {
     System.out.println("Working directory: " + System.getProperty("user.dir"));
@@ -126,7 +133,7 @@ public abstract class ArrowheadClientMain {
       System.out.println("Started insecure server at: " + baseUri);
     } catch (IOException | ProcessingException e) {
       throw new ServiceConfigurationError(
-          "Make sure you gave a valid address in the app.properties file! (Assignable to this JVM and not in use already)", e);
+          "Make sure you gave a valid address in the config file! (Assignable to this JVM and not in use already)", e);
     }
   }
 
@@ -135,47 +142,51 @@ public abstract class ArrowheadClientMain {
     config.registerClasses(classes);
     config.packages(packages);
 
-    String keystorePath = props.getProperty("keystore");
-    String keystorePass = props.getProperty("keystorepass");
-    String keyPass = props.getProperty("keypass");
-    String truststorePath = props.getProperty("truststore");
-    String truststorePass = props.getProperty("truststorepass");
-
     SSLContextConfigurator sslCon = new SSLContextConfigurator();
-    sslCon.setKeyStoreFile(keystorePath);
-    sslCon.setKeyStorePass(keystorePass);
-    sslCon.setKeyPass(keyPass);
-    sslCon.setTrustStoreFile(truststorePath);
-    sslCon.setTrustStorePass(truststorePass);
-    if (!sslCon.validateConfiguration(true)) {
-      throw new AuthException("SSL Context is not valid, check the certificate files or app.properties!", Status.UNAUTHORIZED.getStatusCode());
+    sslCon.setKeyStoreFile(props.getProperty("keystore"));
+    sslCon.setKeyStorePass(props.getProperty("keystorepass"));
+    sslCon.setKeyPass(props.getProperty("keypass"));
+    sslCon.setTrustStoreFile(props.getProperty("truststore"));
+    sslCon.setTrustStorePass(props.getProperty("truststorepass"));
+    SSLContext sslContext;
+    try {
+      sslContext = sslCon.createSSLContext(true);
+    } catch (GenericStoreException e) {
+      System.out.println("Provided SSLContext is not valid, moving to certificate bootstrapping.");
+      try {
+        sslCon = CertificateBootstrapper.bootstrap(clientType, props.getProperty("secure_system_name"));
+      } catch (ArrowheadException e1) {
+        throw new AuthException("Certificate bootstrapping failed with: " + e.getMessage(), e);
+      }
+      sslContext = sslCon.createSSLContext(true);
+      props = Utility.getProp();
     }
-
-    SSLContext sslContext = sslCon.createSSLContext();
     Utility.setSSLContext(sslContext);
 
-    KeyStore keyStore = SecurityUtils.loadKeyStore(keystorePath, keystorePass);
+    KeyStore keyStore = SecurityUtils.loadKeyStore(props.getProperty("keystore"), props.getProperty("keystorepass"));
     X509Certificate serverCert = SecurityUtils.getFirstCertFromKeyStore(keyStore);
     base64PublicKey = Base64.getEncoder().encodeToString(serverCert.getPublicKey().getEncoded());
     System.out.println("Server PublicKey Base64: " + base64PublicKey);
     String serverCN = SecurityUtils.getCertCNFromSubject(serverCert.getSubjectDN().getName());
     if (!SecurityUtils.isKeyStoreCNArrowheadValid(serverCN)) {
       throw new AuthException(
-          "Server CN ( " + serverCN + ") is not compliant with the Arrowhead cert structure, since it does not have 5 parts, or does not end with"
-              + " \"arrowhead.eu\".", Status.UNAUTHORIZED.getStatusCode());
+          "Server CN ( " + serverCN + ") is not compliant with the Arrowhead cert structure, since it does not have 5 "
+              + "parts, or does not end with" + " \"arrowhead.eu\".");
     }
     config.property("server_common_name", serverCN);
 
     URI uri = UriBuilder.fromUri(baseUri).build();
     try {
-      server = GrizzlyHttpServerFactory
-          .createHttpServer(uri, config, true, new SSLEngineConfigurator(sslCon).setClientMode(false).setNeedClientAuth(true), false);
+      server = GrizzlyHttpServerFactory.createHttpServer(uri, config, true,
+                                                         new SSLEngineConfigurator(sslCon).setClientMode(false)
+                                                                                          .setNeedClientAuth(true),
+                                                         false);
       server.getServerConfiguration().setAllowPayloadForUndefinedHttpMethods(true);
       server.start();
       System.out.println("Started secure server at: " + baseUri);
     } catch (IOException | ProcessingException e) {
       throw new ServiceConfigurationError(
-          "Make sure you gave a valid address in the app.properties file! (Assignable to this JVM and not in use already)", e);
+          "Make sure you gave a valid address in the config file! (Assignable to this JVM and not in use already)", e);
     }
   }
 
@@ -186,5 +197,4 @@ public abstract class ArrowheadClientMain {
     System.out.println(clientType + " Server stopped");
     System.exit(0);
   }
-
 }

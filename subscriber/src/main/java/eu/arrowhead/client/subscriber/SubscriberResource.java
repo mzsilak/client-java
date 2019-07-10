@@ -17,11 +17,14 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import org.apache.log4j.Logger;
 
 @Path("notify")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class SubscriberResource {
+
+  private static final Logger log = Logger.getLogger(SubscriberResource.class.getName());
 
   //Method which can be called to check, if the web server works or not
   @GET
@@ -33,8 +36,8 @@ public class SubscriberResource {
     and metadata.*/
   @POST
   public Response receiveEvent(Event event) {
-    System.out.println("New event received:");
-    System.out.println(event.toString());
+    log.info("Received new event: " + event.toString());
+    //business logic here reacting to the event
     return Response.ok().build();
   }
 

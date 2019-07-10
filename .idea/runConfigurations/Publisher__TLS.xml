@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Publisher (TLS)" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="eu.arrowhead.client.publisher.PublisherMain" />
+    <module name="publisher" />
+    <option name="PROGRAM_PARAMETERS" value="-tls" />
+    <option name="WORKING_DIRECTORY" value="$MODULE_WORKING_DIR$" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

@@ -13,14 +13,12 @@ import eu.arrowhead.client.common.Utility;
 import eu.arrowhead.client.common.exception.AuthException;
 import eu.arrowhead.client.common.misc.SecurityUtils;
 import javax.annotation.Priority;
-import javax.inject.Inject;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.Provider;
 
 @Provider
@@ -30,14 +28,12 @@ public class AccessControlFilter implements ContainerRequestFilter {
 
   @Context
   Configuration configuration;
-  @Inject
-  private javax.inject.Provider<UriInfo> uriInfo;
 
   @Override
   public void filter(ContainerRequestContext requestContext) {
     SecurityContext sc = requestContext.getSecurityContext();
-    String requestTarget = Utility.stripEndSlash(requestContext.getUriInfo().getRequestUri().toString());
     if (sc.isSecure()) {
+      String requestTarget = Utility.stripEndSlash(requestContext.getUriInfo().getRequestUri().toString());
       String subjectName = sc.getUserPrincipal().getName();
       if (isClientAuthorized(subjectName)) {
         System.out.println("SSL identification is successful! Cert: " + subjectName);

@@ -13,6 +13,7 @@ import eu.arrowhead.client.common.Utility;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -30,7 +31,7 @@ public class InboundDebugFilter implements ContainerRequestFilter {
       String prettyJson = Utility.getRequestPayload(requestContext.getEntityStream());
       System.out.println(prettyJson);
 
-      InputStream in = new ByteArrayInputStream(prettyJson.getBytes("UTF-8"));
+      InputStream in = new ByteArrayInputStream(prettyJson.getBytes(StandardCharsets.UTF_8));
       requestContext.setEntityStream(in);
     }
   }
