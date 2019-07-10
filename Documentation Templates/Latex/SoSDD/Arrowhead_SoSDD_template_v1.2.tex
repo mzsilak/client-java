@@ -1,0 +1,339 @@
+% This file was converted to LaTeX by Writer2LaTeX ver. 1.4
+% see http://writer2latex.sourceforge.net for more info
+\documentclass{article}
+\usepackage[latin1]{inputenc}
+\usepackage[T3,T1]{fontenc}
+\usepackage[english,swedish]{babel}
+\usepackage[noenc]{tipa}
+\usepackage{tipx}
+\usepackage[geometry,weather,misc,clock]{ifsym}
+\usepackage{pifont}
+\usepackage{eurosym}
+\usepackage{amsmath}
+\usepackage{wasysym}
+\usepackage{amssymb,amsfonts,textcomp}
+\usepackage{array}
+\usepackage{supertabular}
+\usepackage{hhline}
+\usepackage[pdftex]{graphicx}
+\makeatletter
+\newcommand\arraybslash{\let\\\@arraycr}
+\makeatother
+\setlength\tabcolsep{1mm}
+\renewcommand\arraystretch{1.3}
+\newcounter{Table}
+\renewcommand\theTable{\arabic{Table}}
+
+\usepackage{lastpage}
+\usepackage[hmargin=3cm,top=6cm,headheight=5cm,footskip=65pt]{geometry}
+
+\usepackage{fancyhdr}
+\fancyhf{}
+\lhead{
+\includegraphics[width=2cm]{fig/Arrowhead_logo}
+}
+\rhead{%
+  \begin{tabular}{|p{8cm}|p{3cm}|}
+\hline
+    \small{Document title} & \small{Document type} \\
+    SysDD Temaplate - White box design & Template \\
+    \small{Date} & \small{Version} \\
+    \date{\today} & 1.2 \\
+    \small{Author} & \small{Status} \\
+    Fredrik Blomstedt & Proposed \\
+    \small{Contact} & \small{Page} \\
+    fredrik.blomstedt@bnearit.se & \thepage (\pageref{LastPage})\\ \hline
+  \end{tabular}%
+}
+
+\lfoot{
+\includegraphics[width=2cm]{fig/Artemis_logo}
+}
+\rfoot{Contributed by the Arrowhead project, www.arrowhead.eu}
+
+\renewcommand*{\headrulewidth}{0pt}
+\pagestyle{fancy}
+
+
+
+\title{System-of-Systems Design Description (SoSDD) Template}
+\begin{document}
+
+\maketitle
+\setcounter{tocdepth}{10}
+\renewcommand\contentsname{}
+\tableofcontents
+
+\newpage
+
+\section{System-of-Systems Design Description Overview}
+This document should describe how a ``System-of-Systems Design Description'' document is instantiated into an existing System-of-Systems describing the technologies being used. Therefore, this document should point out all necessary Black Box System Description (SysD) and White Box System Design Description (SysDD) documents, which describe the systems used in this realization.
+
+This section should contain a high level overview of the system, complementing the abstract design contained in ``System-of-Systems Description (SoSD)'' with implementation details.
+
+The formal picture, presented on the ``System-of-Systems Description'' document, shows the relations between the different components should be complemented with the technologies being used (COAP, XMPP, XML, ZigBee, etc). A pointer to the SoSD document must also be placed here.
+
+Table \stepcounter{Table}{\theTable} Pointers to SoSD documents
+
+\begin{flushleft}
+\tablefirsthead{}
+\tablehead{}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{1.7677599in}|m{4.26916in}|}
+\hline
+Pointer to SoSD doc: &
+Path the document on the repository\\\hline
+\end{supertabular}
+\end{flushleft}
+Since it is a deployment description, the entire setup of the system must be explained. It must describe the pilots in detail, in order to be deployed. 
+
+%An example of how this template can be used can be found on the SVN server in: {\dots}{\dots}{\dots}.Arrowhead{\textbackslash}Meetings{\textbackslash}Multi WP Workshops{\textbackslash}2013-11-05 Porto{\textbackslash}Documenting{\textbackslash}Examples{\textbackslash}SoSDD{\textbackslash}Arrowhead SoSDD WP5 Example\_v0.1.
+
+\section{Systems }
+This section MUST contain pointers to SysD and SysDD documents, which implements the systems.
+
+Table \stepcounter{Table}{\theTable} Pointers to SysD documents
+
+\begin{flushleft}
+\tablefirsthead{}
+\tablehead{}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{1.8663598in}|m{4.17056in}|}
+\hline
+System name &
+Path\\\hline
+System1 &
+Path the document on the repository\\\hline
+System2 &
+Path the document on the repository\\\hline
+\end{supertabular}
+\end{flushleft}
+Table \stepcounter{Table}{\theTable} Pointers to SysDD documents
+
+\begin{flushleft}
+\tablefirsthead{}
+\tablehead{}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{1.8663598in}|m{4.17056in}|}
+\hline
+System Design name &
+Path\\\hline
+SystemDesign1 &
+Path the document on the repository\\\hline
+SystemDesign2 &
+Path the document on the repository\\\hline
+\end{supertabular}
+\end{flushleft}
+\section{Use-cases refinement }
+High level use-cases regarding relations and information exchange between actors, which are specific to the technologies being deployed or represent a more detailed by view of what has been presented on the correspondent ``System-of-system  Description'' document, should be presented.
+
+UML use-case diagrams are suggested to graphically represent the use-cases. If needed a UML sequence diagram can also be added. To include more detail on the use-case section, use the table format, depicted in Table 4.
+
+Table \stepcounter{Table}{\theTable} Use-case description table
+
+\begin{flushleft}
+\tablefirsthead{}
+\tablehead{}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{6.16916in}|}
+\hline
+Name of the Use-case\\\hline
+ID: Unique ID\\\hline
+Brief description:
+
+Give a brief description of the use-case.\\\hline
+Primary actors:
+
+Present the primary actor, e.g.,Prosumer\\\hline
+Secondary actors:
+
+Present the secondary actors, e.g., Virtual Market of Energy\\\hline
+Preconditions:
+
+If there are any\\\hline
+Main flow:
+
+Present in a sequence of steps the interactions among the actors 
+
+1-
+
+2-
+
+3-
+
+{\dots}{\dots}{\dots}\\\hline
+Postconditions:
+
+If there are any\\\hline
+Alternative flows:
+
+Any possible alternative flows to the sequence presented in the Main flow section.\\\hline
+\end{supertabular}
+\end{flushleft}
+\section[Structure and Behaviour Diagrams\ \ ]{Structure and Behaviour Diagrams\ \ }
+The diagrams proposed in this section could show two different views:
+
+\begin{itemize}
+\item Structure 
+\item Behavior
+\end{itemize}
+For the Structure, the UML Component diagram or the SysML Block Definition diagram defines the SoS in terms of the Systems listed in Section 2.
+
+For the Behavior, usage of an UML Sequence diagram is suggested.
+
+\section[Physical description (Optional)\ \ ]{Physical description (Optional)\ \ }
+This section should describe non-ICT details. This section should provide details only regarding what is related to the physical implementation, location of devices, constraints, etc.
+
+\section{Security implementation}
+This chapter describes how security is implemented into the System-of-Systems.
+
+\subsection[Technical Security Requirements]{Technical Security Requirements}
+In this chapter the technical realization of the non-technical security requirements, specified in chapter 6.3 of the document SoSD is specified.
+
+\subsection[Decomposition of the System{}-of{}-Systems]{Decomposition of the System-of-Systems}
+In this section a detailed description of the System-of-Systems is required. This may partly be covered by chapter 4. The description needs to cover the following points:
+
+\begin{itemize}
+\item Architecture of the System-of-Systems (diagrams, explanations, technologies used)
+\item Technical description of interface implementation (interfaces between Systems)
+\item Description of implementation of access control mechanisms
+\item Programming languages used
+\end{itemize}
+\subsection{Technical Security Requirements}
+In this chapter the technical realization of the non-technical security requirements, specified in chapter 6.3 of the document SoSD is specified.
+
+\subsection{Data Flow Diagram}
+Provide a Data Flow diagram of the SoS.
+
+\subsection{Threats and Vulnerabilities}
+This chapter contains any known threats and vulnerabilities to the SoS.
+
+\section{Non-functional requirements implementation}
+This section describes requirements regarding QoS, response time, resources, reliability, etc. Note that some of these requirements can be optional.
+
+The following table should specify which non-functional requirements are implemented.
+
+Table \stepcounter{Table}{\theTable} Non-functional requirements
+
+\begin{flushleft}
+\tablefirsthead{}
+\tablehead{}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{0.8816598in}|m{2.63726in}|m{0.76015985in}|m{0.7268598in}|m{0.8483598in}|}
+\hline
+Name &
+Description &
+Type &
+Value &
+Use{}-case\\\hline
+ &
+ &
+ &
+ &
+\\\hline
+\end{supertabular}
+\end{flushleft}
+The above table must report the non-functional requirements, by providing the following information:
+
+Name: The name of the non-functional requirement.
+
+Description: Description of the non-functional requirement.
+
+Type: The type of the non-functional requirement (e.g., hardware, software, performance).
+
+Value: Any constrains it imposes to the use-case(s) (e.g., serve 1000 houses per aggregator, perform 100000 transactions per minute, have a delay of less that 1ms on a message).
+
+Use-case: Provide the ID of the use-case(s) it refers to.
+
+\section[Domain realization contextualization ]{Domain realization contextualization }
+This section contextualizes the implementation into an Arrowhead Area, e.g. DNS structure. 
+
+\section{References}
+Any references must be put here
+
+\section{Revision history}
+\subsection{Amendments}
+\begin{flushleft}
+\tablefirsthead{}
+\tablehead{}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{0.38935986in}|m{1.0045599in}|m{0.6094598in}|m{2.2837598in}|m{1.5677599in}|}
+\hline
+{\selectlanguage{english} No.} &
+{\selectlanguage{english} Date} &
+{\selectlanguage{english} Version} &
+{\selectlanguage{english} Subject of Amendments} &
+{\selectlanguage{english} Author}\\\hline
+{\selectlanguage{english} 1} &
+{\selectlanguage{english} 2013-11-06} &
+{\selectlanguage{english} 0.0} &
+{\selectlanguage{english} Creation} &
+{\selectlanguage{english} Luis Lino Ferreira}\\\hline
+{\selectlanguage{english} 2} &
+{\selectlanguage{english} 2013-11-25} &
+{\selectlanguage{english} 0.1} &
+{\selectlanguage{english} Revisions, nomenclature changes} &
+{\selectlanguage{english} Christos Chrysoulas, Luis Lino Ferreira}\\\hline
+{\selectlanguage{english} 3} &
+{\selectlanguage{english} 2013-12-03} &
+{\selectlanguage{english} 0.2} &
+{\selectlanguage{english} Revisions} &
+{\selectlanguage{english} Christos Chrysoulas}\\\hline
+{\selectlanguage{english} 4} &
+{\selectlanguage{english} 2013-12-18} &
+{\selectlanguage{english} 0.3} &
+{\selectlanguage{english} Text Revisions} &
+{\selectlanguage{english} Christos Chrysoulas}\\\hline
+{\selectlanguage{english} 5} &
+{\selectlanguage{english} 2014-01-11} &
+{\selectlanguage{english} 0.4} &
+{\selectlanguage{english} Quickparts and format to dotx} &
+{\selectlanguage{english} Ove Jansson}\\\hline
+{\selectlanguage{english} 6} &
+{\selectlanguage{english} 2015-02-20} &
+{\selectlanguage{english} 1.0} &
+{\selectlanguage{english} Revision of text} &
+{\selectlanguage{english} Michele Albano / Luis Ferreira}\\\hline
+{\selectlanguage{english} 7} &
+{\selectlanguage{english} 2015-09-30} &
+{\selectlanguage{english} 1.1} &
+{\selectlanguage{english} Refinement of the structure} &
+{\selectlanguage{english} Michele Albano / Luis Ferreira}\\\hline
+{\selectlanguage{english} 8} &
+{\selectlanguage{english} 2015-09-30} &
+{\selectlanguage{english} 1.1} &
+{\selectlanguage{english} Revision} &
+{\selectlanguage{english} Iker Martínez de Soria}\\\hline
+9 & 2016-03-19 & 1.2 & Transfer to Latex & Jerker Delsing \\ \hline
+
+\end{supertabular}
+\end{flushleft}
+\subsection[Quality Assurance]{Quality Assurance}
+\begin{flushleft}
+\tablefirsthead{}
+\tablehead{}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{0.38865986in}|m{1.2011598in}|m{0.5559598in}|m{1.5656599in}|}
+\hline
+{\selectlanguage{english} No.} &
+{\selectlanguage{english} Date} &
+{\selectlanguage{english} Version} &
+{\selectlanguage{english} Approved by}\\\hline
+{\selectlanguage{english} 1} &
+{\selectlanguage{english} YYYY-MM-DD} &
+{\selectlanguage{english} 1.0} &
+{\selectlanguage{english} Nnnnn Nnnnnnn}\\\hline
+{\selectlanguage{english} 2} &
+ &
+ &
+\\\hline
+\end{supertabular}
+\end{flushleft}
+\end{document}

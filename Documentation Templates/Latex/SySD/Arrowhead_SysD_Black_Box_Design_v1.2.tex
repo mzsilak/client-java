@@ -1,0 +1,350 @@
+% This file was converted to LaTeX by Writer2LaTeX ver. 1.4
+% see http://writer2latex.sourceforge.net for more info
+\documentclass{article}
+\usepackage[latin1]{inputenc}
+\usepackage[T3,T1]{fontenc}
+\usepackage[english,swedish]{babel}
+\usepackage[noenc]{tipa}
+\usepackage{tipx}
+\usepackage[geometry,weather,misc,clock]{ifsym}
+\usepackage{pifont}
+\usepackage{eurosym}
+\usepackage{amsmath}
+\usepackage{wasysym}
+\usepackage{amssymb,amsfonts,textcomp}
+\usepackage{array}
+\usepackage{supertabular}
+\usepackage{hhline}
+\usepackage[pdftex]{graphicx}
+\makeatletter
+\newcommand\arraybslash{\let\\\@arraycr}
+\makeatother
+\setlength\tabcolsep{1mm}
+\renewcommand\arraystretch{1.3}
+
+\usepackage{lastpage}
+\usepackage[hmargin=3cm,top=6cm,headheight=5cm,footskip=65pt]{geometry}
+
+\usepackage{fancyhdr}
+\fancyhf{}
+\lhead{
+\includegraphics[width=2cm]{fig/Arrowhead_logo}
+}
+\rhead{%
+  \begin{tabular}{|p{10cm}|p{3cm}|}
+\hline
+    \small{Document title} & \small{Document type} \\
+    SysD Template - Black Box Design & Template \\
+    \small{Date} & \small{Version} \\
+    \date{\today} & 1.2 \\
+    \small{Author} & \small{Status} \\
+    Fredrik Blomstedt & Proposed \\
+    \small{Contact} & \small{Page} \\
+    fredrik.blomstedt@bnearit.se & \thepage (\pageref{LastPage})\\ \hline
+  \end{tabular}%
+}
+
+\lfoot{
+\includegraphics[width=2cm]{fig/Artemis_logo}
+}
+\rfoot{Contributed by the Arrowhead project, www.arrowhead.eu}
+
+\renewcommand*{\headrulewidth}{0pt}
+\pagestyle{fancy}
+
+\newcounter{Table}
+\renewcommand\theTable{\arabic{Table}}
+
+
+\title{SysD Template - Black Box Design}
+
+
+\begin{document}
+
+
+
+\maketitle
+
+\tableofcontents
+\newpage
+
+\section{System Description Overview}
+
+In the System Description document a proper ``Black box'' description of system is presented. Enumerating all the produced/consumed services with references to the IDD's. In this way a clear picture of how to interface the system is provided. A High level overview of the system should be presented in this section.
+
+It can include one or more eye catching figures into this description.
+
+This document does not report non-functional requirements (QoS, robustness, etc) since they are related to the interaction between systems and to the SoS as a whole, and are thus defined in the SoSD document.
+
+%An example of how this template can be used can be found on the SVN server in: {\dots}{\dots}{\dots}.Arrowhead{\textbackslash}Meetings{\textbackslash}Multi WP Workshops{\textbackslash}2013-11-05 Porto{\textbackslash}Documenting{\textbackslash}Examples{\textbackslash}SysD{\textbackslash} Arrowhead SysD Prosumer\_v0.1.docx.
+
+\section{Use-cases }
+Describe typical use cases e.g. using UML use cases diagrams, which can be realised by the system. Only add this section if relevant in relation to SoSD document. Each use-case description should follow the structure defined in Table 1.
+
+Table \stepcounter{Table}{\theTable} Use-case description
+
+\begin{flushleft}
+\tablefirsthead{}
+\tablehead{}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{6.01226in}|}
+\hline
+Name of the Use-case\\\hline
+ID: Unique ID\\\hline
+Brief description:
+
+Give a brief description of the use-case.\\\hline
+Primary actors:
+
+Present the primary actor, e.g.,Prosumer\\\hline
+Secondary actors:
+
+Present the secondary actors, e.g., Virtual Market of Energy\\\hline
+Preconditions:
+
+If there are any\\\hline
+Main flow:
+
+Present in a sequence of steps the interactions among the actors 
+
+1-
+
+2-
+
+3-
+
+{\dots}{\dots}{\dots}\\\hline
+Postconditions:
+
+If there are any\\\hline
+Alternative flows:
+
+Any possible alternative flows to the sequence presented in the Main flow section.\\\hline
+\end{supertabular}
+\end{flushleft}
+\section[Behaviour Diagrams]{Behaviour Diagrams}
+The diagrams proposed in this section are behaviour diagrams such as:
+
+\begin{itemize}
+\item Sequence diagrams to specify how to interact with this component (e.g. substation). The use of UML or SysML is proposed.
+\item Activity diagrams to define how this component is integrated in a process as a whole. The use of UML or SysML is proposed. 
+\end{itemize}
+\section{Application services}
+This section contains the Produced and Consumed services, which are described on a technology dependent Interface Design Description (IDD) document. An IDD accordingly specifies the details needed for implementation of service providers and consumers for a Service Description (SD) it refers to, appointing specific technology and semantics to be used and any interpretation, selection of parts, etc. -- i.e. all details needed for plug and play.  
+
+\subsection[Produced Services]{Produced Services}
+Table \stepcounter{Table}{\theTable} Pointers to IDD documents
+
+\begin{flushleft}
+\tablefirsthead{}
+\tablehead{}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{2.12756in}|m{3.80526in}|}
+\hline
+{\selectlanguage{english} Service} &
+{\selectlanguage{english} IDD Document Reference}\\\hline
+{\selectlanguage{english} Service1} &
+{\selectlanguage{english} Path the document on the repository}\\\hline
+{\selectlanguage{english} Service2} &
+{\selectlanguage{english} Path the document on the repository}\\\hline
+{\selectlanguage{english} Servicex} &
+{\selectlanguage{english} Path the document on the repository}\\\hline
+\end{supertabular}
+\end{flushleft}
+A description of the provided services should also be included.
+
+\subsection[Consumed Services]{Consumed Services}
+Table \stepcounter{Table}{\theTable} Pointers to IDD documents
+
+\begin{flushleft}
+\tablefirsthead{}
+\tablehead{}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{2.12756in}|m{3.80526in}|}
+\hline
+{\selectlanguage{english} Service} &
+{\selectlanguage{english} IDD Document Reference}\\\hline
+{\selectlanguage{english} Service1} &
+{\selectlanguage{english} Path the document on the repository}\\\hline
+{\selectlanguage{english} Service2} &
+{\selectlanguage{english} Path the document on the repository}\\\hline
+{\selectlanguage{english} Servicex} &
+{\selectlanguage{english} Path the document on the repository}\\\hline
+\end{supertabular}
+\end{flushleft}
+A description of the consumed services should be included.
+
+\section[Interoperability using REST]{Interoperability using REST}
+This section will describe the how this system connects with the Arrowhead Interoperability Layer and with other kinds of Frameworks.
+
+According to the interoperability approach adopted by Arrowhead there shall be one IDD that is considered as the Arrowhead Interoperability Layer specification for each Service Description (SD) with interoperability capabilities, as well as the ones defined in Section 4.
+
+Since REST has been evaluated as a suitable communication paradigm for Arrowhead compliant services, REST{}-based interaction is required recommended to be appointed proper paradigm for usage on the Arrowhead Interoperability Layer IDDs. The proper implementation of REST is defined by the communication profile defined in Arrowhead CP REST\_WS-TLS-XML v1.0 ({\dots}{\textbackslash}Arrowhead{\textbackslash}Common Design Repository{\textbackslash}03. APPROVED{\textbackslash}04. Design{\textbackslash}07. Services{\textbackslash}04. Communication Profiles{\textbackslash}Arrowhead CP REST\_WS-none-XML v0.0.1).
+
+\subsection[Produced Services]{Produced Services}
+Table \stepcounter{Table}{\theTable} Pointers to IDD documents
+
+\begin{flushleft}
+\tablefirsthead{}
+\tablehead{}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{2.12756in}|m{3.80526in}|}
+\hline
+{\selectlanguage{english} Service} &
+{\selectlanguage{english} IDD Document Reference}\\\hline
+{\selectlanguage{english} Service1} &
+{\selectlanguage{english} Path the document on the repository}\\\hline
+{\selectlanguage{english} Service2} &
+{\selectlanguage{english} Path the document on the repository}\\\hline
+{\selectlanguage{english} Servicex} &
+{\selectlanguage{english} Path the document on the repository}\\\hline
+\end{supertabular}
+\end{flushleft}
+A description of the provided services should also be included.
+
+\subsection[Consumed Services]{Consumed Services}
+Table \stepcounter{Table}{\theTable} Pointers to IDD documents
+
+\begin{flushleft}
+\tablefirsthead{}
+\tablehead{}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{2.12756in}|m{3.80526in}|}
+\hline
+{\selectlanguage{english} Service} &
+{\selectlanguage{english} IDD Document Reference}\\\hline
+{\selectlanguage{english} Service1} &
+{\selectlanguage{english} Path the document on the repository}\\\hline
+{\selectlanguage{english} Service2} &
+{\selectlanguage{english} Path the document on the repository}\\\hline
+{\selectlanguage{english} Servicex} &
+{\selectlanguage{english} Path the document on the repository}\\\hline
+\end{supertabular}
+\end{flushleft}
+\subsection{Sequence Diagrams (optional)}
+It is expected that some specific services using the Interoperability Layer will have to change their behaviour. This section must show the specific behavioural features of the services interconnected by the Arrowhead Interoperability Layer.
+
+It is proposed to use in this section UML sequence diagrams, defining the interactions among service producers and consumers.
+
+\section{Security }
+This chapter defines high-level security principles the system needs to follow on a non-technical, generic level.
+
+\subsection{Security Objectives}
+High-level security objectives for the system need to be defined. They are the basis for the definition of concrete security requirements. Objectives shall in any case cover the well-known AIC-triad (availability, integrity, confidentiality). The attribute availability ensures that information is available when it is needed. Integrity refers to the authorized modification of data within a given system. Confidentiality seeks to ensure that information can only be read by authorized subjects. 
+
+\subsection{Assets}
+List of assets (important resources) that need to be protected. Examples of assets include e.g. operational assets (they support the function of a process/service), functional assets which related to the value of the service i.e. the direct product {\dots}. High level asset {\dots}.
+
+\subsection[Non{}-technical Security Requirements]{Non-technical Security Requirements}
+In this section the defined security objectives are applied on the assets to be protected. Please note that the technical security requirements are defined in the SysDD documentation.  
+
+Non-technical security requirements shall be collected using a table with the following format.
+
+Table \stepcounter{Table}{\theTable} Non-technical security requirements
+
+\begin{flushleft}
+\tablefirsthead{}
+\tablehead{}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{m{1.4420599in}|m{1.4455599in}|m{1.4281598in}|m{1.4594599in}|}
+\multicolumn{1}{m{1.4420599in}}{\raggedleft Number} &
+\multicolumn{1}{m{1.4455599in}}{Objective} &
+\multicolumn{1}{m{1.4281598in}}{Asset} &
+\multicolumn{1}{m{1.4594599in}}{Requirement description}\\\hline
+\raggedleft Sys\_NSR1 &
+Refer to defined objective
+
+A{\textbar}I{\textbar}C{\textbar}Other &
+Refer to defined asset &
+\\\hhline{~---}
+\raggedleft Sys\_NSR2 &
+ &
+ &
+\\\hhline{~---}
+\raggedleft Sys\_NSR{\dots}n &
+ &
+ &
+\\\hhline{~---}
+\end{supertabular}
+\end{flushleft}
+\section[References]{References}
+Any references must be placed here.
+
+\section[Revision history]{Revision history}
+\subsection[Amendments]{Amendments}
+\begin{flushleft}
+\tablefirsthead{}
+\tablehead{}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{0.38235986in}|m{1.1358598in}|m{0.6219598in}|m{2.05526in}|m{1.5018599in}|}
+\hline
+{\selectlanguage{english} No.} &
+{\selectlanguage{english} Date} &
+{\selectlanguage{english} Version} &
+{\selectlanguage{english} Subject of Amendments} &
+{\selectlanguage{english} Author}\\\hline
+{\selectlanguage{english} 1} &
+{\selectlanguage{english} 2013-12-03} &
+{\selectlanguage{english} 0.2} &
+{\selectlanguage{english} Revisions} &
+{\selectlanguage{english} Christos Chrysoulas}\\\hline
+{\selectlanguage{english} 2} &
+{\selectlanguage{english} 2013-12-18} &
+{\selectlanguage{english} 0.3} &
+{\selectlanguage{english} Text Revisions} &
+{\selectlanguage{english} Christos Chrysoulas}\\\hline
+{\selectlanguage{english} 3} &
+{\selectlanguage{english} 2013-12-24} &
+{\selectlanguage{english} 0.4} &
+{\selectlanguage{english} Added quickparts and saved as template} &
+{\selectlanguage{english} Ove Jansson}\\\hline
+{\selectlanguage{english} 4} &
+{\selectlanguage{english} 2015-02-19} &
+{\selectlanguage{english} 1.0} &
+{\selectlanguage{english} Text clean-up. Addition of Meta Layer related section} &
+{\selectlanguage{english} Luis Lino Ferreira / Michele Albano}\\\hline
+{\selectlanguage{english} 5} &
+{\selectlanguage{english} 2015-03-23} &
+{\selectlanguage{english} 1.01} &
+{\selectlanguage{english} Text review}
+
+{\selectlanguage{english} Replaced Meta-layer with Interoperability Layer} &
+{\selectlanguage{english} Luis Lino Ferreira}\\\hline
+{\selectlanguage{english} 6} &
+{\selectlanguage{english} 2015-09-30} &
+{\selectlanguage{english} 1.1} &
+{\selectlanguage{english} Refinement of the structure} &
+{\selectlanguage{english} Michele Albano / Luis Ferreira}\\\hline
+7 & 2016-03-19 & 1.2 & Transfer to Latex & Jerker Delsing \\ \hline
+\end{supertabular}
+\end{flushleft}
+\subsection[Quality Assurance]{Quality Assurance}
+\begin{flushleft}
+\tablefirsthead{}
+\tablehead{}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{0.38865986in}|m{1.2011598in}|m{0.6219598in}|m{1.5656599in}|}
+\hline
+{\selectlanguage{english} No.} &
+{\selectlanguage{english} Date} &
+{\selectlanguage{english} Version} &
+{\selectlanguage{english} Approved by}\\\hline
+{\selectlanguage{english} 1} &
+ &
+ &
+\\\hline
+{\selectlanguage{english} 2} &
+ &
+ &
+\\\hline
+\end{supertabular}
+\end{flushleft}
+\end{document}

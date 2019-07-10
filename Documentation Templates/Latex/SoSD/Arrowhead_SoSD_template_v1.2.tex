@@ -1,0 +1,319 @@
+% This file was converted to LaTeX by Writer2LaTeX ver. 1.4
+% see http://writer2latex.sourceforge.net for more info
+\documentclass{article}
+\usepackage[latin1]{inputenc}
+\usepackage[T3,T1]{fontenc}
+\usepackage[english,swedish]{babel}
+\usepackage[noenc]{tipa}
+\usepackage{tipx}
+\usepackage[geometry,weather,misc,clock]{ifsym}
+\usepackage{pifont}
+\usepackage{eurosym}
+\usepackage{amsmath}
+\usepackage{wasysym}
+\usepackage{amssymb,amsfonts,textcomp}
+\usepackage{array}
+\usepackage{supertabular}
+\usepackage{hhline}
+\usepackage[pdftex]{graphicx}
+\makeatletter
+\newcommand\arraybslash{\let\\\@arraycr}
+\makeatother
+\setlength\tabcolsep{1mm}
+\renewcommand\arraystretch{1.3}
+\newcounter{Table}
+\renewcommand\theTable{\arabic{Table}}
+
+\usepackage{lastpage}
+\usepackage[hmargin=3cm,top=6cm,headheight=5cm,footskip=65pt]{geometry}
+
+\usepackage{fancyhdr}
+\fancyhf{}
+\lhead{
+\includegraphics[width=2cm]{fig/Arrowhead_logo}
+}
+\rhead{%
+  \begin{tabular}{|p{8cm}|p{3cm}|}
+\hline
+    \small{Document title} & \small{Document type} \\
+    SysDD Temaplate - White box design & Template \\
+    \small{Date} & \small{Version} \\
+    \date{\today} & 1.2 \\
+    \small{Author} & \small{Status} \\
+    Fredrik Blomstedt & Proposed \\
+    \small{Contact} & \small{Page} \\
+    fredrik.blomstedt@bnearit.se & \thepage (\pageref{LastPage})\\ \hline
+  \end{tabular}%
+}
+
+\lfoot{
+\includegraphics[width=2cm]{fig/Artemis_logo}
+}
+\rfoot{Contributed by the Arrowhead project, www.arrowhead.eu}
+
+\renewcommand*{\headrulewidth}{0pt}
+\pagestyle{fancy}
+
+
+
+
+\title{System-of-Systems Description (SoSD) Template}
+\begin{document}
+\maketitle
+
+
+\setcounter{tocdepth}{10}
+\renewcommand\contentsname{}
+\tableofcontents
+\newpage
+
+\section{System of Systems Overview}
+The main objective of this section is to give a high level overview of an Arrowhead compliant System-of-Systems in an abstract way, i.e., without defining any specific technologies. The instantiation of this model into specific technologies should be done on the ``System-of-Systems Design Description (SoSDD)'' documents. Each of its systems should be described on the SysD template.
+
+This description can include an eye catching figure, which can help on defining the overall system and on highlighting the SoS main functionalities, associated with some text.
+
+This description MUST also include a Formal Diagram depicting the systems contained on the System-of-Systems (e.g. on an Arrowhead pilot) and an associated description. The usage of UML Component diagram is suggested. A component diagram has the objective of showing the structural relationships between the components of a system.
+
+No technologies should be described in this document.
+
+%An example of how this template can be used can be found on the SVN server in: {\dots}{\dots}{\dots}.Arrowhead{\textbackslash}Meetings{\textbackslash}Multi WP Workshops{\textbackslash}2013-11-05 Porto{\textbackslash}Documenting{\textbackslash}Examples{\textbackslash}SoSD{\textbackslash}Arrowhead SoSD WP5 Example\_v0.1.
+
+\section{Systems }
+This section MUST contain pointers to SysD document, which instantiates the SoS, i.e., the Arrowhead Pilot.
+
+Table \stepcounter{Table}{\theTable} Pointers to the SysD documents
+
+\begin{flushleft}
+\tablefirsthead{}
+\tablehead{}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{1.4531599in}|m{4.47956in}|}
+\hline
+System name &
+Path\\\hline
+System1 &
+Path the document on the repository\\\hline
+System2 &
+Path the document on the repository\\\hline
+\end{supertabular}
+\end{flushleft}
+\section{Use-cases}
+This section should identify and define the main actors and include high level use-cases regarding relations and information exchange between actors.
+
+UML use-case diagrams are suggested to graphically represent the use-cases. If needed a UML sequence diagram can also be added. Each use-case description should follow the structure defined in Table 2.
+
+Table \stepcounter{Table}{\theTable} Use-case description table
+
+\begin{flushleft}
+\tablefirsthead{}
+\tablehead{}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{6.01226in}|}
+\hline
+Name of the Use-case\\\hline
+ID: Unique ID\\\hline
+Brief description:
+
+Give a brief description of the use-case.\\\hline
+Primary actors:
+
+Present the primary actor, e.g.,Prosumer\\\hline
+Secondary actors:
+
+Present the secondary actors, e.g., Virtual Market of Energy\\\hline
+Preconditions:
+
+If there are any\\\hline
+Main flow:
+
+Present in a sequence of steps the interactions among the actors 
+
+1-
+
+2-
+
+3-
+
+{\dots}{\dots}{\dots}\\\hline
+Postconditions:
+
+If there are any\\\hline
+Alternative flows:
+
+Any possible alternative flows to the sequence presented in the Main flow section.\\\hline
+\end{supertabular}
+\end{flushleft}
+\section{Behaviour diagrams}
+The diagrams proposed in this section are behaviour diagrams that provide a high level view of the SoS. The use of UML Activity diagrams, and BPMN or SysML Activity diagram is proposed.
+
+The UML Activity diagrams are used to model a higher-level business process or processes.\ \ 
+
+The BPMN diagrams provide a notation that is easily understandable by all business users. This includes the business analysts that create the initial drafts of the processes to the technical developers responsible for implementing the technology that will perform those processes.
+
+The SysML diagrams support the specification, analysis, design, verification and validation systems that include hardware, software, data, personnel, procedures and facilities.
+
+This section can also reports Sequence diagrams to specify how the involved systems interact with each other. The use of UML or SysML is proposed.
+
+\section{Non-functional requirements}
+Describe requirements regarding QoS, response time, resources, reliability, etc. Since most of the systems can work on a best-effort strategy, some of these requirements can be optional.
+
+This section reports, for example, the QoS targets for the whole SoS. For example, the total number of systems that must be supported in terms of scalability, the total number of service requests that must be satisfied per unit time in terms of the whole SoS deployment.
+
+The following table reports multiple non-functional requirements sets, each one pertaining to a use case. Thus, some use cases could have all types of non-functional requirements, some other ones may have just a subset of them.
+
+Table \stepcounter{Table}{\theTable} Non-functional requirements description
+
+\begin{flushleft}
+\tablefirsthead{}
+\tablehead{}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{0.8622598in}|m{2.5504599in}|m{0.7434598in}|m{0.7156598in}|m{0.82545984in}|}
+\hline
+Name &
+Description &
+Type &
+Value &
+Use{}-case\\\hline
+ &
+ &
+ &
+ &
+\\\hline
+\end{supertabular}
+\end{flushleft}
+In Table 3 must put the non-functional requirements, by providing the following information:
+
+Name: The Unique name (UID) of the non-functional requirement.
+
+Description: Description of the non-functional requirement.
+
+Type: The type of the non-functional requirement (e.g., hardware, software, performance).
+
+Value / Range of values: Any constrains it imposes to the use-case(s) (e.g., serve 1000 houses per aggregator, perform 100000 transactions per minute, have a delay of less that 1ms on a message).
+
+Use-case: Provide the ID of the use-case(s) it refers to.
+
+\section[Security ]{Security }
+This chapter defines high-level security principles the SoS needs to follow on a non-technical, generic level. Please note: Clearly distinguish between security aspects that apply on inter-system level (SoS) and security aspects on lower levels (system, service).
+
+\subsection{Security Objectives}
+High-level security objectives need to be defined. They are the basis for the definition of concrete security requirements. Objectives shall in any case cover the well-known AIC-triad (availability, integrity, confidentiality). The attribute availability ensures that information is available when it is needed. Integrity refers to the protection of data against unauthorized modification within a given system. Confidentiality seeks to ensure that information can only be read by authorized subjects. 
+
+\subsection{Assets}
+List of assets (important resources) that are meant to be protected. Examples of assets include e.g. operational assets (they support the function of a process/service), functional assets that related to the value of the service i.e. the direct product {\dots}. High level asset {\dots}.
+
+\subsection{Non-technical Security Requirements}
+In this section the defined security objectives are applied on the assets to be protected. Please note, that the technical security requirements are defined in the SoSDD documentation.  
+
+Non-technical security requirements shall be collected using a table with the following format.
+
+Table \stepcounter{Table}{\theTable} Non-technical security requriments
+
+\begin{flushleft}
+\tablefirsthead{}
+\tablehead{}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{m{1.4462599in}|m{1.4441599in}|m{1.4268599in}|m{1.4580599in}|}
+\multicolumn{1}{m{1.4462599in}}{\raggedleft Number} &
+\multicolumn{1}{m{1.4441599in}}{Objective} &
+\multicolumn{1}{m{1.4268599in}}{Asset} &
+\multicolumn{1}{m{1.4580599in}}{Requirement description}\\\hline
+\raggedleft SoS\_NSR1 &
+Refer to defined objective
+
+A{\textbar}I{\textbar}C{\textbar}Other &
+Refer to defined asset &
+\\\hhline{~---}
+\raggedleft SoS\_NSR2 &
+ &
+ &
+\\\hhline{~---}
+\raggedleft SoS\_NSR{\dots}n &
+ &
+ &
+\\\hhline{~---}
+\end{supertabular}
+\end{flushleft}
+\section[References]{References}
+Any references must be put here.
+
+\section{Revision history}
+\subsection{Amendments}
+\begin{flushleft}
+\tablefirsthead{}
+\tablehead{}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{0.38375986in}|m{0.9740599in}|m{0.6073598in}|m{2.2087598in}|m{1.5240599in}|}
+\hline
+{\selectlanguage{english} No.} &
+{\selectlanguage{english} Date} &
+{\selectlanguage{english} Version} &
+{\selectlanguage{english} Subject of Amendments} &
+{\selectlanguage{english} Author}\\\hline
+{\selectlanguage{english} 1} &
+{\selectlanguage{english} 2013-11-06} &
+{\selectlanguage{english} 0.1} &
+{\selectlanguage{english} Creation} &
+{\selectlanguage{english} Luis Lino Ferreira}\\\hline
+{\selectlanguage{english} 2} &
+{\selectlanguage{english} 2013-12-03} &
+{\selectlanguage{english} 0.2} &
+{\selectlanguage{english} Text Revision} &
+{\selectlanguage{english} Christos Chrysoulas}\\\hline
+{\selectlanguage{english} 3} &
+{\selectlanguage{english} 2013-12-09} &
+{\selectlanguage{english} 0.2} &
+{\selectlanguage{english} Text Revision} &
+{\selectlanguage{english} Luis Lino Ferreira}\\\hline
+{\selectlanguage{english} 4} &
+{\selectlanguage{english} 2013-12-18} &
+{\selectlanguage{english} 0.3} &
+{\selectlanguage{english} Text Revision} &
+{\selectlanguage{english} Christos Chrysoulas}\\\hline
+{\selectlanguage{english} 5} &
+{\selectlanguage{english} 2014-01-10} &
+{\selectlanguage{english} 0.4} &
+{\selectlanguage{english} Quick parts. Save as template} &
+{\selectlanguage{english} Ove Jansson}\\\hline
+{\selectlanguage{english} 6} &
+\centering{\selectlanguage{english} 2015-02-20} &
+{\selectlanguage{english} 1.0} &
+{\selectlanguage{english} Revision of text} &
+{\selectlanguage{english} Michele Albano}\\\hline
+{\selectlanguage{english} 7} &
+{\selectlanguage{english} 2015-09-1830} &
+{\selectlanguage{english} 1.1} &
+{\selectlanguage{english} Refinement of the textstructure} &
+{\selectlanguage{english} Michele Albano / Luis Ferreira}\\\hline
+8 & 2016-03-19 & 1.2 & Transfer to Latex & Jerker Delsing \\ \hline
+
+\end{supertabular}
+\end{flushleft}
+\subsection[Quality Assurance]{Quality Assurance}
+\begin{flushleft}
+\tablefirsthead{}
+\tablehead{}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{0.38865986in}|m{1.2011598in}|m{0.5559598in}|m{1.5656599in}|}
+\hline
+{\selectlanguage{english} No.} &
+{\selectlanguage{english} Date} &
+{\selectlanguage{english} Version} &
+{\selectlanguage{english} Approved by}\\\hline
+{\selectlanguage{english} 1} &
+{\selectlanguage{english} YYYY-MM-DD} &
+{\selectlanguage{english} 1.0} &
+{\selectlanguage{english} Nnnnn Nnnnnnn}\\\hline
+{\selectlanguage{english} 2} &
+ &
+ &
+\\\hline
+\end{supertabular}
+\end{flushleft}
+\end{document}

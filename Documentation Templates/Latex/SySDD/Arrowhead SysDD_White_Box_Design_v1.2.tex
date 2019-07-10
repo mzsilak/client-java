@@ -1,0 +1,286 @@
+% This file was converted to LaTeX by Writer2LaTeX ver. 1.4
+% see http://writer2latex.sourceforge.net for more info
+\documentclass{article}
+\usepackage[latin1]{inputenc}
+\usepackage[T3,T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage[noenc]{tipa}
+\usepackage{tipx}
+\usepackage[geometry,weather,misc,clock]{ifsym}
+%\usepackage{pifont}
+\usepackage{eurosym}
+\usepackage{amsmath}
+\usepackage{wasysym}
+\usepackage{amssymb,amsfonts,textcomp}
+\usepackage{array}
+\usepackage{supertabular}
+\usepackage{hhline}
+\usepackage[pdftex]{graphicx}
+\usepackage{lastpage}
+\usepackage[hmargin=3cm,top=5cm,headheight=4cm,footskip=65pt]{geometry}
+
+\usepackage{fancyhdr}
+\fancyhf{}
+\lhead{
+\includegraphics[width=2cm]{fig/Arrowhead_logo}
+}
+\rhead{%
+  \begin{tabular}{|p{8cm}|p{3cm}|}
+\hline
+    \small{Document title} & \small{Document type} \\
+    SysDD Temaplate - White box design & Template \\
+    Date & Version \\
+    \date{\today} & 1.2 \\
+    Author & Status \\
+    Fredrik Blomstedt & Proposed \\
+    Contact & Page \\
+    fredrik.blomstedt@bnearit.se & \thepage (\pageref{LastPage})\\ \hline
+  \end{tabular}%
+}
+
+\lfoot{
+\includegraphics[width=2cm]{fig/Artemis_logo}
+}
+\rfoot{Contributed by the Arrowhead project, www.arrowhead.eu}
+
+\renewcommand*{\headrulewidth}{0pt}
+\pagestyle{fancy}
+
+\newcounter{Table}
+\renewcommand\theTable{\arabic{Table}}
+
+
+\title{SysDD Temaplate - White box design}
+%\author{Jerker Delsing, jerker.delsing@ltu.se}
+\date{\empty}
+
+\begin{document}
+
+\maketitle
+
+
+%\section{Table of Contents}
+\setcounter{tocdepth}{10}
+%\renewcommand\contentsname{}
+
+\tableofcontents
+
+\newpage
+
+This document is optional. We are here recommending a structure for
+this document, but the list of sections can be modified on a case by
+case basis. It can include one or more eye catching figures into this description.
+
+This document does not report non-functional requirements (QoS,
+robustness, etc) since they are related to the interaction between
+systems and to the SoS as a whole, and are thus defined in the SoSD
+(objectives) and SoSDD documents (implementations).
+
+\section{System Design Description Overview}
+
+In Table \ref{tab:sys_info} the global System Information is given.
+
+\begin{table}[h!]
+  \centering
+  \begin{tabular}{|p{5cm}|p{8cm}|}
+\hline
+    Name & An unique name readable by humans \\ \hline
+    Maintainer  & e.g. Jerker Delsing, jerker.delsing@ltu.se \\ \hline 
+    SySD document & Path in Arrowhead Framework repository \\ \hline
+  \end{tabular}
+  \caption{System information}
+  \label{tab:sys_info}
+\end{table}
+
+It can include one or more eye catching figures into this description.
+
+This document is optional. We are here recommending a structure for this document, but the list of sections can be modified on a case by case basis.
+
+This document does not report non-functional requirements (QoS, robustness, etc) since they are related to the interaction between systems and to the SoS as a whole, and are thus defined in the SoSD (objectives) and SoSDD documents (implementations).
+
+%An example of how this template can be used can be found on the SVN server in: {\dots}{\dots}{\dots}.Arrowhead{\textbackslash}Meetings{\textbackslash}Multi WP Workshops{\textbackslash}2013-11-05 Porto{\textbackslash}Documenting{\textbackslash}Examples{\textbackslash}SysDD{\textbackslash} Arrowhead SysDD Prosumer\_v0.1.docx.
+
+\section{Use-cases}
+Describe typical use cases e.g. using UML use cases diagrams, which can be realised by the system.
+
+Only add this section if relevant in relation to SysD document. Each use-case description should follow the structure defined in Table 3.
+
+Table \stepcounter{Table}{\theTable} Use-case description
+
+\begin{flushleft}
+\tablefirsthead{}
+\tablehead{}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{6.16916in}|}
+\hline
+Name of the Use-case\\\hline
+ID: Unique ID\\\hline
+Brief description:
+
+Give a brief description of the use-case.\\\hline
+Primary actors:
+
+Present the primary actor, e.g.,Prosumer\\\hline
+Secondary actors:
+
+Present the secondary actors, e.g., Virtual Market of Energy\\\hline
+Preconditions:
+
+If there are any\\\hline
+Main flow:
+
+Present in a sequence of steps the interactions among the actors 
+
+1-
+
+2-
+
+3-
+
+{\dots}{\dots}{\dots}\\\hline
+Postconditions:
+
+If there are any\\\hline
+Alternative flows:
+
+Any possible alternative flows to the sequence presented in the Main flow section.\\\hline
+\end{supertabular}
+\end{flushleft}
+\section{Typical Scenarios (optional)}
+Table 4 Typical Scenario description
+
+\begin{flushleft}
+\tablefirsthead{}
+\tablehead{}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{1.4726598in}|m{4.5643597in}|}
+\hline
+{\selectlanguage{english} Typical Scenario} &
+{\selectlanguage{english} For white-box design, describe typical interactions between required and provided service e.g. }
+
+\begin{itemize}
+\item {\selectlanguage{english} using UML sequence diagrams, which can be used as test cases for system integration testing}
+\item {\selectlanguage{english} implementing UML or SysML activity diagrams, which can be used as process definition for the system or the integration between systems}
+\end{itemize}
+\\\hline
+\end{supertabular}
+\end{flushleft}
+\section[Internal structure]{Internal structure}
+This section reports the internal structure of the system in terms of classes, and the location of the classes into the program files.
+
+The UML Component diagram or the SysML Block Definition diagram are recommended for a formal description of the class structure.
+
+Pointers to the location of the program files can be given using a table.
+
+Table 4 Program files
+
+\begin{flushleft}
+\tablefirsthead{}
+\tablehead{}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{1.4726598in}|m{4.5643597in}|}
+\hline
+{\selectlanguage{english} Class name} &
+{\selectlanguage{english} Name of the file(s) / optional location of the file(s)}\\\hline
+\end{supertabular}
+\end{flushleft}
+\section[Security ]{Security }
+This chapter describes how security is implemented into the systems.
+
+\subsection[Technical Security Requirements]{Technical Security Requirements}
+In this chapter the technical realization of the non-technical System security requirements, specified in chapter 5.3 of the document SySD is specified.
+
+\subsection{Decomposition of the System}
+In this section a detailed description of the System implementation is required.  The description needs to cover the following points:
+
+\begin{itemize}
+\item Architecture of the System (diagrams, explanations, technologies used)
+\item Technical description of interface implementation (interfaces between Systems)
+\item Description of implementation of access control mechanisms
+\item Programming languages used
+\end{itemize}
+\subsection{Technical Security Requirements}
+In this chapter the technical realization of the non-technical System security requirements, specified in chapter 5.3 of the document SySD is specified.
+
+\subsection{Data Flow Diagram}
+Provide a Data Flow diagram of the System.
+
+\subsection{Threats and Vulnerabilities}
+This chapter contains any known threats and vulnerabilities to the System.
+
+\section[References]{References}
+Any references must be placed here
+
+\section[Revision history]{Revision history}
+\subsection[Amendments]{Amendments}
+\begin{flushleft}
+\tablefirsthead{}
+\tablehead{}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{0.38935986in}|m{1.2011598in}|m{0.5545598in}|m{2.1420598in}|m{1.5670599in}|}
+\hline
+{\selectlanguage{english} No.} &
+{\selectlanguage{english} Date} &
+{\selectlanguage{english} Version} &
+{\selectlanguage{english} Subject of Amendments} &
+{\selectlanguage{english} Author}\\\hline
+{\selectlanguage{english} 1} &
+{\selectlanguage{english} 2013-12-03} &
+{\selectlanguage{english} 0.2} &
+{\selectlanguage{english} Revision} &
+{\selectlanguage{english} Christos Chrysoulas}\\\hline
+{\selectlanguage{english} 2} &
+{\selectlanguage{english} 2013-12-18} &
+{\selectlanguage{english} 0.3} &
+{\selectlanguage{english} Text Revisions} &
+{\selectlanguage{english} Christos Chrysoulas}\\\hline
+{\selectlanguage{english} 3} &
+{\selectlanguage{english} 2013-12-24} &
+{\selectlanguage{english} 0.4} &
+{\selectlanguage{english} Added quick parts and saved as template} &
+{\selectlanguage{english} Ove Jansson}\\\hline
+{\selectlanguage{english} 4} &
+{\selectlanguage{english} 2015-02-19} &
+{\selectlanguage{english} 1.0} &
+{\selectlanguage{english} Revision} &
+{\selectlanguage{english} Michele Albano / Luis Ferreira}\\\hline
+{\selectlanguage{english} 7} &
+{\selectlanguage{english} 2015-09-30} &
+{\selectlanguage{english} 1.1} &
+{\selectlanguage{english} Refinement of the structure} &
+{\selectlanguage{english} Michele Albano / Luis Ferreira}\\\hline
+{\selectlanguage{english} 8} &
+{\selectlanguage{english} 2015-09-30} &
+{\selectlanguage{english} 1.1} &
+{\selectlanguage{english} Revision} &
+{\selectlanguage{english} Iker Martínez de Soria}\\\hline
+9 & 2016-03-19 & 1.2 & Transfer to Latex & Jerker Delsing \\ \hline
+\end{supertabular}
+\end{flushleft}
+\subsection[Quality Assurance]{Quality Assurance}
+\begin{flushleft}
+\tablefirsthead{}
+\tablehead{}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{0.38865986in}|m{1.2011598in}|m{0.5559598in}|m{1.5656599in}|}
+\hline
+{\selectlanguage{english} No.} &
+{\selectlanguage{english} Date} &
+{\selectlanguage{english} Version} &
+{\selectlanguage{english} Approved by}\\\hline
+{\selectlanguage{english} 1} &
+ &
+ &
+\\\hline
+{\selectlanguage{english} 2} &
+ &
+ &
+\\\hline
+\end{supertabular}
+\end{flushleft}
+\end{document}

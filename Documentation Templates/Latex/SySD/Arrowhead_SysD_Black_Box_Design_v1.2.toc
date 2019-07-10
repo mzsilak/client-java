@@ -1,0 +1,167 @@
+\select@language {swedish}
+\contentsline {section}{\numberline {1}System Description Overview}{2}
+\contentsline {section}{\numberline {2}Use-cases }{2}
+\contentsline {section}{\numberline {3}Behaviour Diagrams}{3}
+\contentsline {section}{\numberline {4}Application services}{3}
+\contentsline {subsection}{\numberline {4.1}Produced Services}{3}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\contentsline {subsection}{\numberline {4.2}Consumed Services}{3}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\contentsline {section}{\numberline {5}Interoperability using REST}{4}
+\contentsline {subsection}{\numberline {5.1}Produced Services}{4}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\contentsline {subsection}{\numberline {5.2}Consumed Services}{4}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\contentsline {subsection}{\numberline {5.3}Sequence Diagrams (optional)}{4}
+\contentsline {section}{\numberline {6}Security }{5}
+\contentsline {subsection}{\numberline {6.1}Security Objectives}{5}
+\contentsline {subsection}{\numberline {6.2}Assets}{5}
+\contentsline {subsection}{\numberline {6.3}Non{}-technical Security Requirements}{5}
+\contentsline {section}{\numberline {7}References}{5}
+\contentsline {section}{\numberline {8}Revision history}{6}
+\contentsline {subsection}{\numberline {8.1}Amendments}{6}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\contentsline {subsection}{\numberline {8.2}Quality Assurance}{7}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}

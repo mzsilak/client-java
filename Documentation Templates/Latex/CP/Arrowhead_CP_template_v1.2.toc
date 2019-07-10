@@ -1,0 +1,101 @@
+\select@language {swedish}
+\contentsline {section}{\numberline {1}Communication Profile Overview}{2}
+\contentsline {section}{\numberline {2}Message Exchange Patterns / Protocols}{2}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\contentsline {section}{\numberline {3}Security}{2}
+\contentsline {section}{\numberline {4}Endpoint Description}{2}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\contentsline {section}{\numberline {5}Metadata}{3}
+\contentsline {section}{\numberline {6}Data Encoding }{3}
+\contentsline {section}{\numberline {7}Description Format}{3}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\contentsline {section}{\numberline {8}Standards and Demarcations}{3}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\contentsline {section}{\numberline {9}References}{4}
+\contentsline {section}{\numberline {10}Revision history}{4}
+\contentsline {subsection}{\numberline {10.1}Amendments}{4}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\contentsline {subsection}{\numberline {10.2}Quality Assurance}{4}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}

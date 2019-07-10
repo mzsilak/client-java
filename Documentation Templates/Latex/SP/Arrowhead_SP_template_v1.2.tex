@@ -1,0 +1,202 @@
+% This file was converted to LaTeX by Writer2LaTeX ver. 1.4
+% see http://writer2latex.sourceforge.net for more info
+\documentclass{article}
+\usepackage[latin1]{inputenc}
+\usepackage[T3,T1]{fontenc}
+\usepackage[english,swedish]{babel}
+\usepackage[noenc]{tipa}
+\usepackage{tipx}
+\usepackage[geometry,weather,misc,clock]{ifsym}
+\usepackage{pifont}
+\usepackage{eurosym}
+\usepackage{amsmath}
+\usepackage{wasysym}
+\usepackage{amssymb,amsfonts,textcomp}
+\usepackage{array}
+\usepackage{supertabular}
+\usepackage{hhline}
+\usepackage[pdftex]{graphicx}
+\makeatletter
+\newcommand\arraybslash{\let\\\@arraycr}
+\makeatother
+\setlength\tabcolsep{1mm}
+\renewcommand\arraystretch{1.3}
+\newcounter{Table}
+\renewcommand\theTable{\arabic{Table}}
+
+\usepackage{lastpage}
+\usepackage[hmargin=3cm,top=6cm,headheight=5cm,footskip=65pt]{geometry}
+
+\usepackage{fancyhdr}
+\fancyhf{}
+\lhead{
+\includegraphics[width=2cm]{fig/Arrowhead_logo}
+}
+\rhead{%
+  \begin{tabular}{|p{8cm}|p{3cm}|}
+\hline
+    \small{Document title} & \small{Document type} \\
+    SysDD Temaplate - White box design & Template \\
+    \small{Date} & \small{Version} \\
+    \date{\today} & 1.2 \\
+    \small{Author} & \small{Status} \\
+    Fredrik Blomstedt & Proposed \\
+    \small{Contact} & \small{Page} \\
+    fredrik.blomstedt@bnearit.se & \thepage (\pageref{LastPage})\\ \hline
+  \end{tabular}%
+}
+
+\lfoot{
+\includegraphics[width=2cm]{fig/Artemis_logo}
+}
+\rfoot{Contributed by the Arrowhead project, www.arrowhead.eu}
+
+\renewcommand*{\headrulewidth}{0pt}
+\pagestyle{fancy}
+
+\title{Semantic Profile (SP) Template}
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+\section[Overview]{Overview}
+In this section a complete description of technologies and specifications that build the Semantic Profile must be provided. A Semantic Profile Identifier must be the outcome of the present document. The semantic profile document should contain information about how a specific measurement (e.g., a temperature value or a pressure value) is coded.  The measurement can be coded in e.g., on XML or in SenML. So the Semantic profile identifier should be in case of a temperature is going to be Temperature-XML or Temperature -SenML.
+
+An example of how this document can be elaborated can be found in SVN repository {\dots}{\textbackslash}Meetings{\textbackslash}Multi WP Workshops{\textbackslash}2013-11-05 Porto{\textbackslash}Documenting{\textbackslash}Examples{\textbackslash}IDD{\textbackslash} SP{\textbackslash}Arrowhead SP Temperature-XML.
+
+\section[Data Format]{Data Format}
+Describe the data format used by the Semantic Profile, with a meaning associated to each field of each message type. and, iIf possible, provide an example of a message, e.g. an XML description of the servicea message.
+
+A link to a formal document describing the format encoding must be provided. For example, this section can report the location on the repository of an XML Schema. For example, it can include:
+
+Table \stepcounter{Table}{\theTable} List of XML Schemas
+
+\begin{flushleft}
+\tablefirsthead{}
+\tablehead{}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{1.6045599in}|m{4.35876in}|}
+\hline
+{\selectlanguage{english} Schema} &
+{\selectlanguage{english} Location}\\\hline
+{\selectlanguage{english} Flex-offer} &
+{\selectlanguage{english} ..{\textbackslash}Common Design Repository{\textbackslash}01. Working Proposal{\textbackslash}04. Design{\textbackslash}05. WP5 Application Systems{\textbackslash}02. System-Components{\textbackslash}Messages Schemas{\textbackslash}flex-offer.xsd}\\\hline
+\end{supertabular}
+\end{flushleft}
+\section[Standards and Demarcations]{Standards and Demarcations}
+Present a list of specifications used by the Semantic Profile, in the following format (Table 1).
+
+Table \stepcounter{Table}{\theTable} List of specifications
+
+\begin{flushleft}
+\tablefirsthead{}
+\tablehead{}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{3.1538599in}|m{1.8323599in}|m{0.8677598in}|}
+\hline
+{\selectlanguage{english} Specification} &
+{\selectlanguage{english} Type} &
+{\selectlanguage{english} Version}\\\hline
+ &
+ &
+\\\hline
+\end{supertabular}
+\end{flushleft}
+Specification: The name of the specification e.g, eXtensible Markup Language (XML).
+
+Type: The type of the specification e.g., W3C Specification.
+
+Version: The version of the specification e.g., 1.0.
+
+All possible demarcations should be presented here. Any issues regarding incompatibilities must be placed here. The use of a table is proposed (Table 2).
+
+Table \stepcounter{Table}{\theTable} Demarcation List
+
+\begin{flushleft}
+\tablefirsthead{}
+\tablehead{}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{3.1538599in}|m{1.8323599in}|m{0.8677598in}|}
+\hline
+{\selectlanguage{english} Specification} &
+{\selectlanguage{english} Type} &
+{\selectlanguage{english} Version}\\\hline
+ &
+ &
+\\\hline
+\end{supertabular}
+\end{flushleft}
+Specification: The Name of the specification e.g, eXtensible Markup Language (XML).
+
+Type: The type of the specification e.g., W3C Specification.
+
+Version: The version of the specification e.g., 1.0.
+
+\section[References]{References}
+Any references must be placed here.
+
+\section[Revision history]{Revision history}
+\subsection[Amendments]{Amendments}
+\begin{flushleft}
+\tablefirsthead{}
+\tablehead{}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{0.38235986in}|m{1.1400598in}|m{0.6219598in}|m{2.0462599in}|m{1.5066599in}|}
+\hline
+{\selectlanguage{english} No.} &
+{\selectlanguage{english} Date} &
+{\selectlanguage{english} Version} &
+{\selectlanguage{english} Subject of Amendments} &
+{\selectlanguage{english} Author}\\\hline
+{\selectlanguage{english} 1} &
+{\selectlanguage{english} 2013-12-19} &
+{\selectlanguage{english} 0.3} &
+{\selectlanguage{english} Text Revisions} &
+{\selectlanguage{english} Christos Chrysoulas}\\\hline
+{\selectlanguage{english} 2} &
+{\selectlanguage{english} 2014-01-10} &
+{\selectlanguage{english} 0.4} &
+{\selectlanguage{english} Quickparts and dotx} &
+{\selectlanguage{english} Ove Jansson}\\\hline
+{\selectlanguage{english} 3} &
+{\selectlanguage{english} 2015-02-20} &
+{\selectlanguage{english} 1.0} &
+{\selectlanguage{english} Revision of text} &
+{\selectlanguage{english} Michele Albano / Luis Ferreira}\\\hline
+{\selectlanguage{english} 4} &
+{\selectlanguage{english} 2015-09-3018} &
+{\selectlanguage{english} 1.1} &
+{\selectlanguage{english} Refinement of the textof the structure} &
+{\selectlanguage{english} Michele Albano / Luis Ferreira}\\\hline
+5 & 2016-03-19 & 1.2 & Transfer to Latex & Jerker Delsing \\ \hline
+
+\end{supertabular}
+\end{flushleft}
+\subsection[Quality Assurance]{Quality Assurance}
+\begin{flushleft}
+\tablefirsthead{}
+\tablehead{}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{0.38865986in}|m{1.2011598in}|m{0.6219598in}|m{1.5656599in}|}
+\hline
+{\selectlanguage{english} No.} &
+{\selectlanguage{english} Date} &
+{\selectlanguage{english} Version} &
+{\selectlanguage{english} Approved by}\\\hline
+{\selectlanguage{english} 1} &
+ &
+ &
+\\\hline
+{\selectlanguage{english} 2} &
+ &
+ &
+\\\hline
+\end{supertabular}
+\end{flushleft}
+\end{document}

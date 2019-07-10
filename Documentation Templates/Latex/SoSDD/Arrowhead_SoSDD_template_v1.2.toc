@@ -1,0 +1,126 @@
+\select@language {swedish}
+\contentsline {section}{\numberline {1}System-of-Systems Design Description Overview}{2}
+\contentsline {section}{\numberline {2}Systems }{2}
+\contentsline {section}{\numberline {3}Use-cases refinement }{2}
+\contentsline {section}{\numberline {4}Structure and Behaviour Diagrams\ \ }{3}
+\contentsline {section}{\numberline {5}Physical description (Optional)\ \ }{3}
+\contentsline {section}{\numberline {6}Security implementation}{4}
+\contentsline {subsection}{\numberline {6.1}Technical Security Requirements}{4}
+\contentsline {subsection}{\numberline {6.2}Decomposition of the System{}-of{}-Systems}{4}
+\contentsline {subsection}{\numberline {6.3}Technical Security Requirements}{4}
+\contentsline {subsection}{\numberline {6.4}Data Flow Diagram}{4}
+\contentsline {subsection}{\numberline {6.5}Threats and Vulnerabilities}{4}
+\contentsline {section}{\numberline {7}Non-functional requirements implementation}{4}
+\contentsline {section}{\numberline {8}Domain realization contextualization }{5}
+\contentsline {section}{\numberline {9}References}{5}
+\contentsline {section}{\numberline {10}Revision history}{5}
+\contentsline {subsection}{\numberline {10.1}Amendments}{5}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\contentsline {subsection}{\numberline {10.2}Quality Assurance}{5}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}
+\select@language {english}
+\select@language {swedish}

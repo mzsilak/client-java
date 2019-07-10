@@ -1,0 +1,16 @@
+eu\arrowhead\demo\model\ArrowheadDevice.class
+eu\arrowhead\demo\model\FakeGrovePi.class
+eu\arrowhead\demo\ButtonPressedListener.class
+eu\arrowhead\demo\OnboardingStatus.class
+eu\arrowhead\demo\model\OnboardingResponse.class
+eu\arrowhead\demo\DemoMain.class
+eu\arrowhead\demo\model\ServiceEndpoint.class
+eu\arrowhead\demo\model\DeviceRegistryEntry.class
+eu\arrowhead\demo\model\SystemRegistryEntry.class
+eu\arrowhead\demo\model\ServiceQueryForm.class
+eu\arrowhead\demo\model\OnboardingRequest.class
+eu\arrowhead\demo\GroveRotaryObserver.class
+eu\arrowhead\demo\OnboardingStatus$BlinkingLed.class
+eu\arrowhead\demo\RotaryValueListener.class
+eu\arrowhead\demo\GroveButtonObserver.class
+eu\arrowhead\demo\model\ServiceQueryResult.class

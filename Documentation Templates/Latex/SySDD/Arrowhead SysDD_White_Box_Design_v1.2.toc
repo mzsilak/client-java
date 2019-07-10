@@ -1,0 +1,109 @@
+\select@language {english}
+\contentsline {section}{\numberline {1}System Design Description Overview}{2}
+\contentsline {section}{\numberline {2}Use-cases}{2}
+\contentsline {section}{\numberline {3}Typical Scenarios (optional)}{3}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\contentsline {section}{\numberline {4}Internal structure}{3}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\contentsline {section}{\numberline {5}Security }{4}
+\contentsline {subsection}{\numberline {5.1}Technical Security Requirements}{4}
+\contentsline {subsection}{\numberline {5.2}Decomposition of the System}{4}
+\contentsline {subsection}{\numberline {5.3}Technical Security Requirements}{4}
+\contentsline {subsection}{\numberline {5.4}Data Flow Diagram}{4}
+\contentsline {subsection}{\numberline {5.5}Threats and Vulnerabilities}{4}
+\contentsline {section}{\numberline {6}References}{4}
+\contentsline {section}{\numberline {7}Revision history}{4}
+\contentsline {subsection}{\numberline {7.1}Amendments}{4}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\contentsline {subsection}{\numberline {7.2}Quality Assurance}{5}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}

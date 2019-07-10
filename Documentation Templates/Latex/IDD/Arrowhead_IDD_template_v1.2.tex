@@ -1,0 +1,239 @@
+% This file was converted to LaTeX by Writer2LaTeX ver. 1.4
+% see http://writer2latex.sourceforge.net for more info
+\documentclass{article}
+\usepackage[latin1]{inputenc}
+\usepackage[T3,T1]{fontenc}
+\usepackage[english,swedish]{babel}
+\usepackage[noenc]{tipa}
+\usepackage{tipx}
+\usepackage[geometry,weather,misc,clock]{ifsym}
+\usepackage{pifont}
+\usepackage{eurosym}
+\usepackage{amsmath}
+\usepackage{wasysym}
+\usepackage{amssymb,amsfonts,textcomp}
+\usepackage{array}
+\usepackage{supertabular}
+\usepackage{hhline}
+\usepackage[pdftex]{graphicx}
+\makeatletter
+\newcommand\arraybslash{\let\\\@arraycr}
+\makeatother
+\setlength\tabcolsep{1mm}
+\renewcommand\arraystretch{1.3}
+\newcounter{Table}
+\renewcommand\theTable{\arabic{Table}}
+
+\usepackage{lastpage}
+\usepackage[hmargin=3cm,top=6cm,headheight=5cm,footskip=65pt]{geometry}
+
+\usepackage{fancyhdr}
+\fancyhf{}
+\lhead{
+\includegraphics[width=2cm]{fig/Arrowhead_logo}
+}
+\rhead{%
+  \begin{tabular}{|p{8cm}|p{3cm}|}
+\hline
+    \small{Document title} & \small{Document type} \\
+    SysDD Temaplate - White box design & Template \\
+    \small{Date} & \small{Version} \\
+    \date{\today} & 1.2 \\
+    \small{Author} & \small{Status} \\
+    Fredrik Blomstedt & Proposed \\
+    \small{Contact} & \small{Page} \\
+    fredrik.blomstedt@bnearit.se & \thepage (\pageref{LastPage})\\ \hline
+  \end{tabular}%
+}
+
+\lfoot{
+\includegraphics[width=2cm]{fig/Artemis_logo}
+}
+\rfoot{Contributed by the Arrowhead project, www.arrowhead.eu}
+
+\renewcommand*{\headrulewidth}{0pt}
+\pagestyle{fancy}
+
+
+\title{Interface Design Description (IDD) Template}
+\begin{document}
+
+\maketitle
+
+\setcounter{tocdepth}{10}
+\renewcommand\contentsname{}
+\tableofcontents
+\section[Interface Design Description Overview]{Interface Design Description Overview}
+This document must describe how to realize the service, pointing out the technologies and the Communication Profile to be used. 
+
+The set of technologies to be used must be explicitly described.
+
+An abstract view of how the interfaces are realized by using the Communication Profile should be placed here.
+
+This section MUST contain pointers to SD documents.
+
+Table \stepcounter{Table}{\theTable} Pointers to SD documents
+
+\begin{flushleft}
+\tablefirsthead{}
+\tablehead{}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{1.8427598in}|m{4.0900598in}|}
+\hline
+Service description &
+Path\\\hline
+Service1 &
+Path the document on the repository\\\hline
+Service2 &
+Path the document on the repository\\\hline
+\end{supertabular}
+\end{flushleft}
+This section MUST contain pointers to CP documents.
+
+Table \stepcounter{Table}{\theTable} Pointers to CP documents
+
+\begin{flushleft}
+\tablefirsthead{}
+\tablehead{}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{1.8497599in}|m{4.08306in}|}
+\hline
+Communication Profile &
+Path\\\hline
+Profile1 &
+Path the document on the repository\\\hline
+Profile2 &
+Path the document on the repository\\\hline
+\end{supertabular}
+\end{flushleft}
+This section MUST contain pointers to SP documents.
+
+Table \stepcounter{Table}{\theTable} Pointers to SP documnets
+
+\begin{flushleft}
+\tablefirsthead{}
+\tablehead{}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{1.8393599in}|m{4.09346in}|}
+\hline
+Semantic Profile &
+Path\\\hline
+Profile1 &
+Path the document on the repository\\\hline
+Profile2 &
+Path the document on the repository\\\hline
+\end{supertabular}
+\end{flushleft}
+
+%An example of how this document can be elaborated can be found in SVN repository {\dots}/Meetings/Multi WP Workshops/2013-11-05 Porto/Documenting/Examples/IDD/Arrowhead IDD Temperature SenML CoAP.
+
+\section[Interfaces]{Interfaces}
+Every interface should be fully described in a separate section. In this section correlation among communication profiles and interfaces must be presented in detail. Every function included in the interface should also be presented and explained in a subsection for each interface. Sequence diagrams might be included to give a clearer view on functions' usage. 
+
+The use of the following diagrams is proposed for representing the behavior:
+
+\begin{itemize}
+\item UML Sequence diagram
+\item UML or SysML Activity diagram
+\end{itemize}
+If it is considered necessary to define the structure, these diagrams can be a choice:
+
+\begin{itemize}
+\item UML Class diagram
+\item UML Component diagram
+\item SysML Parametric diagram
+\item SysML Block Definition diagram
+\end{itemize}
+Every function that is included in the interfaces must be described to the necessary extent. The usage of tables to provide that kind of information can be used, describing for instance, method's names, types, input parameters and output information. Every function should also be described in separated sections in order to for someone else to easily to implement it.  
+
+In the following table, a function name should be defined. For each operation, a service which is related to the function, a method to interact with the function, the input parameters and the output that will be obtained when using the function should also be presented.
+
+Table \stepcounter{Table}{\theTable} Function description
+
+\begin{flushleft}
+\tablefirsthead{}
+\tablehead{}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{1.4955599in}|m{1.4962599in}|m{0.8073598in}|m{1.0045599in}|m{1.2011598in}|}
+\hline
+{\selectlanguage{english} Function} &
+{\selectlanguage{english} Service} &
+{\selectlanguage{english} Method} &
+{\selectlanguage{english} Input} &
+{\selectlanguage{english} Output }\\\hline
+ &
+ &
+ &
+ &
+\\\hline
+\end{supertabular}
+\end{flushleft}
+Each function which is described in Table 4 is required to be pointed to the correct interface provided by the Communication Profile (eg. subsection 8.1 -- Operations, included in Section 8 -- Description Format) and Semantic Profile that are implemented by the current service.
+
+\section[Information Model]{Information Model}
+In the present section detailed information regarding the format of the service data throughout the process, should be provided. Specifications regarding data format should be described here. 
+
+UML or SysML can be used to describe the relation of data format and specifications. 
+
+If any metadata is available, also must be included in this section.
+
+This section does not report how data is encoding, since it is targeted by CP / SP documents.
+
+\section[\ \ References]{\ \ References}
+Any references must be placed here.
+
+\section[Revision history]{Revision history}
+\subsection[Amendments]{Amendments}
+\begin{flushleft}
+\tablefirsthead{}
+\tablehead{}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{0.38445985in}|m{1.1608598in}|m{0.5552598in}|m{2.07616in}|m{1.5198599in}|}
+\hline
+{\selectlanguage{english} No.} &
+{\selectlanguage{english} Date} &
+{\selectlanguage{english} Version} &
+{\selectlanguage{english} Subject of Amendments} &
+{\selectlanguage{english} Author}\\\hline
+{\selectlanguage{english} 1} &
+{\selectlanguage{english} 20-2-2015} &
+{\selectlanguage{english} 1.0} &
+{\selectlanguage{english} Revision of text} &
+{\selectlanguage{english} Michele Albano / Luis Ferreira}\\\hline
+{\selectlanguage{english} 2} &
+{\selectlanguage{english} 30-09-2015} &
+{\selectlanguage{english} 1.1} &
+{\selectlanguage{english} Refinement of the structure} &
+{\selectlanguage{english} Michele Albano / Luis Ferreira}\\\hline
+3 & 2016-03-19 & 1.2 & Transfer to Latex & Jerker Delsing \\ \hline
+
+\end{supertabular}
+\end{flushleft}
+\subsection[Quality Assurance]{Quality Assurance}
+\begin{flushleft}
+\tablefirsthead{}
+\tablehead{}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{0.38865986in}|m{1.2011598in}|m{0.5559598in}|m{1.5656599in}|}
+\hline
+{\selectlanguage{english} No.} &
+{\selectlanguage{english} Date} &
+{\selectlanguage{english} Version} &
+{\selectlanguage{english} Approved by}\\\hline
+{\selectlanguage{english} 1} &
+ &
+ &
+\\\hline
+{\selectlanguage{english} 2} &
+ &
+ &
+\\\hline
+\end{supertabular}
+\end{flushleft}
+\end{document}
