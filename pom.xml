@@ -21,6 +21,7 @@
     <module>client-common</module>
     <module>consumer</module>
     <module>provider</module>
+    <module>provider-onboarding</module>
     <module>publisher</module>
     <module>subscriber</module>
   </modules>

@@ -23,6 +23,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Properties;
 import java.util.ServiceConfigurationError;
 import java.util.Set;
 import javax.net.ssl.SSLContext;
@@ -61,6 +62,25 @@ public abstract class ArrowheadClientMain {
   }
 
   protected void init(ClientType client, String[] args, Set<Class<?>> classes, String[] packages) {
+
+    parseArguments(client, args);
+    startHttpServer(classes, packages);
+  }
+
+  protected void startHttpServer(Set<Class<?>> classes, String[] packages) {
+    if (isSecure) {
+      List<String> allMandatoryProperties = new ArrayList<>(clientType.getAlwaysMandatoryFields());
+      allMandatoryProperties.addAll(clientType.getSecureMandatoryFields());
+      Utility.checkProperties(props.stringPropertyNames(), allMandatoryProperties);
+      startSecureServer(classes, packages);
+    } else {
+      Utility.checkProperties(props.stringPropertyNames(), clientType.getAlwaysMandatoryFields());
+      startServer(classes, packages);
+    }
+  }
+
+  protected void parseArguments(final ClientType client, final String[] args)
+  {
     System.out.println("Working directory: " + System.getProperty("user.dir"));
     clientType = client;
     System.setProperty("client_type", clientType.toString());
@@ -85,16 +105,6 @@ public abstract class ArrowheadClientMain {
     int port = isSecure ? props.getIntProperty("secure_port", clientType.getSecurePort())
                         : props.getIntProperty("insecure_port", clientType.getInsecurePort());
     baseUri = Utility.getUri(address, port, null, isSecure, true);
-
-    if (isSecure) {
-      List<String> allMandatoryProperties = new ArrayList<>(clientType.getAlwaysMandatoryFields());
-      allMandatoryProperties.addAll(clientType.getSecureMandatoryFields());
-      Utility.checkProperties(props.stringPropertyNames(), allMandatoryProperties);
-      startSecureServer(classes, packages);
-    } else {
-      Utility.checkProperties(props.stringPropertyNames(), clientType.getAlwaysMandatoryFields());
-      startServer(classes, packages);
-    }
   }
 
   protected void listenForInput() {
@@ -120,7 +130,7 @@ public abstract class ArrowheadClientMain {
     }
   }
 
-  private void startServer(Set<Class<?>> classes, String[] packages) {
+  protected void startServer(Set<Class<?>> classes, String[] packages) {
     final ResourceConfig config = new ResourceConfig();
     config.registerClasses(classes);
     config.packages(packages);
@@ -142,12 +152,7 @@ public abstract class ArrowheadClientMain {
     config.registerClasses(classes);
     config.packages(packages);
 
-    SSLContextConfigurator sslCon = new SSLContextConfigurator();
-    sslCon.setKeyStoreFile(props.getProperty("keystore"));
-    sslCon.setKeyStorePass(props.getProperty("keystorepass"));
-    sslCon.setKeyPass(props.getProperty("keypass"));
-    sslCon.setTrustStoreFile(props.getProperty("truststore"));
-    sslCon.setTrustStorePass(props.getProperty("truststorepass"));
+    SSLContextConfigurator sslCon = createSSLContextConfigurator();
     SSLContext sslContext;
     try {
       sslContext = sslCon.createSSLContext(true);
@@ -188,6 +193,17 @@ public abstract class ArrowheadClientMain {
       throw new ServiceConfigurationError(
           "Make sure you gave a valid address in the config file! (Assignable to this JVM and not in use already)", e);
     }
+  }
+
+  protected SSLContextConfigurator createSSLContextConfigurator()
+  {
+    SSLContextConfigurator sslCon = new SSLContextConfigurator();
+    sslCon.setKeyStoreFile(props.getProperty("keystore"));
+    sslCon.setKeyStorePass(props.getProperty("keystorepass"));
+    sslCon.setKeyPass(props.getProperty("keypass"));
+    sslCon.setTrustStoreFile(props.getProperty("truststore"));
+    sslCon.setTrustStorePass(props.getProperty("truststorepass"));
+    return sslCon;
   }
 
   protected void shutdown() {
