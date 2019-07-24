@@ -29,17 +29,22 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.NetworkInterface;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.ServiceConfigurationError;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 import javax.ws.rs.NotAllowedException;
@@ -84,7 +89,8 @@ public final class Utility {
 
     Client client;
     if (context != null) {
-      client = ClientBuilder.newBuilder().sslContext(context).withConfig(configuration).hostnameVerifier(allHostsValid).build();
+      client = ClientBuilder.newBuilder().sslContext(context).withConfig(configuration).hostnameVerifier(allHostsValid)
+                            .build();
     } else {
       client = ClientBuilder.newClient(configuration);
     }
@@ -108,12 +114,14 @@ public final class Utility {
 
     if (isSecure && sslClient == null) {
       throw new AuthException(
-          "SSL Context is not set, but secure request sending was invoked. An insecure module can not send requests to secure modules.",
+          "SSL Context is not set, but secure request sending was invoked. An insecure module can not send requests "
+              + "to secure modules.",
           Status.UNAUTHORIZED.getStatusCode());
     }
     Client usedClient = isSecure ? givenContext != null ? createClient(givenContext) : sslClient : client;
 
-    Builder request = usedClient.target(UriBuilder.fromUri(uri).build()).request().header("Content-type", "application/json");
+    Builder request = usedClient.target(UriBuilder.fromUri(uri).build()).request()
+                                .header("Content-type", "application/json");
     Response response; // will not be null after the switch-case
     try {
       switch (method) {
@@ -134,10 +142,11 @@ public final class Utility {
       }
     } catch (ProcessingException e) {
       if (e.getCause().getMessage().contains("PKIX path")) {
-        throw new AuthException("The system at " + uri + " is not part of the same certificate chain of trust!", Status.UNAUTHORIZED.getStatusCode(),
-                                e);
+        throw new AuthException("The system at " + uri + " is not part of the same certificate chain of trust!",
+                                Status.UNAUTHORIZED.getStatusCode(), e);
       } else {
-        throw new UnavailableServerException("Could not get any response from: " + uri, Status.SERVICE_UNAVAILABLE.getStatusCode(), e);
+        throw new UnavailableServerException("Could not get any response from: " + uri,
+                                             Status.SERVICE_UNAVAILABLE.getStatusCode(), e);
       }
     }
 
@@ -225,7 +234,8 @@ public final class Utility {
       new URI(url);
     } catch (URISyntaxException e) {
       if (serverStart) {
-        throw new ServiceConfigurationError(url + " is not a valid URL to start a HTTP server! Please fix the address field in the properties file.");
+        throw new ServiceConfigurationError(
+            url + " is not a valid URL to start a HTTP server! Please fix the address field in the properties file.");
       } else {
         throw new ArrowheadException(url + " is not a valid URL!");
       }
@@ -250,7 +260,8 @@ public final class Utility {
         sb.append(line);
       }
     } catch (UnsupportedEncodingException e) {
-      throw new AssertionError("getRequestPayload InputStreamReader has unsupported character set! Code needs to be changed!", e);
+      throw new AssertionError(
+          "getRequestPayload InputStreamReader has unsupported character set! Code needs to be changed!", e);
     } catch (IOException e) {
       throw new RuntimeException("IOException occured while reading an incoming request payload", e);
     }
@@ -280,7 +291,9 @@ public final class Utility {
       }
     } catch (IOException e) {
       throw new ArrowheadException(
-          "Jackson library threw IOException during JSON serialization! Wrapping it in RuntimeException. Exception message: " + e.getMessage(), e);
+          "Jackson library threw IOException during JSON serialization! Wrapping it in RuntimeException. Exception "
+              + "message: "
+              + e.getMessage(), e);
     }
     return null;
   }
@@ -324,8 +337,10 @@ public final class Utility {
       FileInputStream inputStream = new FileInputStream(file);
       prop.load(inputStream);
     } catch (FileNotFoundException ex) {
-      throw new ServiceConfigurationError(
-          fileName + " file not found, make sure you have the correct working directory set! (directory where the config folder can be found)", ex);
+      throw new ServiceConfigurationError(fileName
+                                              + " file not found, make sure you have the correct working directory "
+                                              + "set! (directory where the config folder can be found)",
+                                          ex);
     } catch (Exception ex) {
       ex.printStackTrace();
     }
@@ -341,7 +356,8 @@ public final class Utility {
       } else if (Files.isReadable(Paths.get(DEFAULT_CONF_DIR))) {
         prop.load(new FileInputStream(new File(DEFAULT_CONF_DIR)));
       } else {
-        throw new ServiceConfigurationError("default.conf file not found in the working directory! (" + System.getProperty("user.dir") + ")");
+        throw new ServiceConfigurationError(
+            "default.conf file not found in the working directory! (" + System.getProperty("user.dir") + ")");
       }
 
       if (Files.isReadable(Paths.get(APP_CONF))) {
@@ -378,7 +394,8 @@ public final class Utility {
   }
 
   public static String getRandomPassword() {
-    PasswordGenerator generator = new PasswordGenerator.Builder().useDigits(true).useLower(true).useUpper(true).usePunctuation(false).build();
+    PasswordGenerator generator = new PasswordGenerator.Builder().useDigits(true).useLower(true).useUpper(true)
+                                                                 .usePunctuation(false).build();
     return generator.generate(12);
   }
 
@@ -395,5 +412,37 @@ public final class Utility {
       result = cause;
     }
     return result;
+  }
+
+  /* If needed, this method can be used to get the IPv4 address of the host machine. Public point-to-point IP
+  addresses are prioritized over private
+    (site local) IP addresses */
+  @SuppressWarnings("unused")
+  public static String getIpAddress() throws SocketException {
+    List<InetAddress> addresses = new ArrayList<>();
+
+    Enumeration e = NetworkInterface.getNetworkInterfaces();
+    while (e.hasMoreElements()) {
+      NetworkInterface inf = (NetworkInterface) e.nextElement();
+      Enumeration ee = inf.getInetAddresses();
+      while (ee.hasMoreElements()) {
+        addresses.add((InetAddress) ee.nextElement());
+      }
+    }
+
+    addresses = addresses.stream().filter(current -> !current.getHostAddress().contains(":"))
+                         .filter(current -> !current.isLoopbackAddress())
+                         .filter(current -> !current.isMulticastAddress())
+                         .filter(current -> !current.isLinkLocalAddress()).collect(Collectors.toList());
+    if (addresses.isEmpty()) {
+      throw new SocketException("No valid addresses left after filtering");
+    }
+    for (InetAddress address : addresses) {
+      if (!address.isSiteLocalAddress()) {
+        return address.getHostAddress();
+      }
+    }
+    InetAddress address = addresses.get(0);
+    return address.getHostAddress();
   }
 }

@@ -17,12 +17,12 @@ import java.util.List;
    which are mandatory to have in their config file. The properties are checked at startup, to see if any mandatory one is missing.*/
 public enum ClientType {
   CONSUMER(8080, 8080, null, Arrays.asList("keystore", "keystorepass", "keypass", "truststore", "truststorepass")),
-  PROVIDER(8460, 8461, Arrays.asList("service_name", "service_uri", "interfaces", "metadata", "insecure_system_name"),
-           Arrays.asList("keystore", "keystorepass", "keypass", "truststore", "truststorepass", "authorization_public_key", "secure_system_name")),
-  PUBLISHER(8462, 8463, Arrays.asList("event_type", "insecure_system_name"),
-            Arrays.asList("keystore", "keystorepass", "keypass", "truststore", "truststorepass", "secure_system_name")),
-  SUBSCRIBER(8464, 8465, Arrays.asList("event_types", "notify_uri", "insecure_system_name"),
-             Arrays.asList("keystore", "keystorepass", "keypass", "truststore", "truststorepass", "secure_system_name"));
+  PROVIDER(8460, 8461, Arrays.asList("service_name", "service_uri", "interfaces", "metadata", "system_name"),
+           Arrays.asList("keystore", "keystorepass", "keypass", "truststore", "truststorepass", "system_name")),
+  PUBLISHER(8462, 8463, Arrays.asList("event_type", "system_name"),
+            Arrays.asList("keystore", "keystorepass", "keypass", "truststore", "truststorepass", "system_name")),
+  SUBSCRIBER(8464, 8465, Arrays.asList("event_types", "notify_uri", "system_name"),
+             Arrays.asList("keystore", "keystorepass", "keypass", "truststore", "truststorepass", "system_name"));
 
   private final int insecurePort;
   private final int securePort;

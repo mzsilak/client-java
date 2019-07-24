@@ -18,25 +18,24 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import javax.ws.rs.core.UriBuilder;
 
 /*
-  OnboardedProviderMain class has the following mandatory functionalities:
+  OnboardingClientProviderMain class has the following mandatory functionalities:
     1) Read in command line, and config file properties
     2) Start a normal HTTP server with REST resource classes
     3) Onboarding using the Onboarding Controller
     3) Register its service into the Device Registry, System Registry and Service Registry
  */
-public class OnboardedProviderMain extends OnboardingClientMain {
+public class OnboardingClientProviderMain extends OnboardingClientMain {
 
   public static void main(String[] args) {
-    new OnboardedProviderMain(args);
+    new OnboardingClientProviderMain(args);
   }
 
   private String orchestrationUri;
 
 
-  private OnboardedProviderMain(String[] args) {
+  private OnboardingClientProviderMain(String[] args) {
     //Register the application components the REST library need to know about
     Set<Class<?>> classes = new HashSet<>(Arrays.asList(TemperatureResource.class, RestResource.class));
     String[] packages = {"eu.arrowhead.client.common"};
@@ -50,13 +49,6 @@ public class OnboardedProviderMain extends OnboardingClientMain {
 
     //Listen for a stop command
     listenForInput();
-  }
-
-  protected OnboardingWithCertificateRequest createOnboardingRequest() {
-    final OnboardingWithCertificateRequest request = new OnboardingWithCertificateRequest();
-    final byte[] rawData = SecurityUtils.loadPEM(props.getProperty("cert_sign_req"));
-    request.setCertificateRequest(Base64.getEncoder().encodeToString(rawData));
-    return request;
   }
 
 
@@ -89,8 +81,8 @@ public class OnboardedProviderMain extends OnboardingClientMain {
     } catch (URISyntaxException e) {
       throw new AssertionError("Parsing the BASE_URI resulted in an error.", e);
     }
-    String insecProviderName = props.getProperty("insecure_system_name");
-    ArrowheadSystem provider = new ArrowheadSystem(insecProviderName, uri.getHost(), uri.getPort(), null);
+    String providerName = props.getProperty("system_name");
+    ArrowheadSystem provider = new ArrowheadSystem(providerName, uri.getHost(), uri.getPort(), null);
 
     //Return the complete request payload
     return new ServiceRegistryEntry(service, provider, serviceUri);
@@ -98,11 +90,10 @@ public class OnboardedProviderMain extends OnboardingClientMain {
 
   private void registerToServiceRegistry(ServiceRegistryEntry entry) {
     //Create the full URL (appending "register" to the base URL)
-    String registerUri = UriBuilder.fromPath(serviceRegUri).path("register").toString();
 
     //Send the registration request
     try {
-      Utility.sendRequest(registerUri, "POST", entry);
+      Utility.sendRequest(serviceRegUri, "POST", entry);
     } catch (ArrowheadException e) {
       /*
         Service Registry might return duplicate entry exception, if a previous instance of the web server already registered this service,
@@ -111,7 +102,7 @@ public class OnboardedProviderMain extends OnboardingClientMain {
       if (e.getExceptionType() == ExceptionType.DUPLICATE_ENTRY) {
         System.out.println("Received DuplicateEntryException from SR, sending delete request and then registering again.");
         unregisterFromServiceRegistry(entry);
-        Utility.sendRequest(registerUri, "POST", entry);
+        Utility.sendRequest(serviceRegUri, "POST", entry);
       } else {
         throw e;
       }
@@ -121,7 +112,7 @@ public class OnboardedProviderMain extends OnboardingClientMain {
 
   private void unregisterFromServiceRegistry(ServiceRegistryEntry entry) {
     //Create the full URL (appending "remove" to the base URL)
-    String removeUri = UriBuilder.fromPath(serviceRegUri).path("remove").toString();
+    String removeUri = serviceRegUri.replace("register", "remove");
     Utility.sendRequest(removeUri, "PUT", entry);
     System.out.println("Removing service is successful!");
   }

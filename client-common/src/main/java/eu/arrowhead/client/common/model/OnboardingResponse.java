@@ -2,9 +2,9 @@ package eu.arrowhead.client.common.model;
 
 public class OnboardingResponse {
     private boolean success;
-    private ServiceEndpoint[] services;
+    private SystemEndpoint[] services;
     private String onboardingCertificate;
-    private String immediateCertificate;
+    private String intermediateCertificate;
     private String rootCertificate;
     private String keyAlgorithm;
     private String keyFormat;
@@ -19,11 +19,11 @@ public class OnboardingResponse {
         this.success = success;
     }
 
-    public ServiceEndpoint[] getServices() {
+    public SystemEndpoint[] getServices() {
         return services;
     }
 
-    public void setServices(ServiceEndpoint[] services) {
+    public void setServices(SystemEndpoint[] services) {
         this.services = services;
     }
 
@@ -35,12 +35,12 @@ public class OnboardingResponse {
         this.onboardingCertificate = onboardingCertificate;
     }
 
-    public String getImmediateCertificate() {
-        return immediateCertificate;
+    public String getIntermediateCertificate() {
+        return intermediateCertificate;
     }
 
-    public void setImmediateCertificate(String immediateCertificate) {
-        this.immediateCertificate = immediateCertificate;
+    public void setIntermediateCertificate(String intermediateCertificate) {
+        this.intermediateCertificate = intermediateCertificate;
     }
 
     public String getRootCertificate() {

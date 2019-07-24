@@ -2,10 +2,10 @@ package eu.arrowhead.client.common.model;
 
 import java.net.URI;
 
-public class ServiceEndpoint {
+public class SystemEndpoint {
 
     public enum Type {
-        DEVICE_REGISTRY, SYSTEM_REGISTRY, SERVICE_REGISTRY
+        DEVICE_REGISTRY_SERVICE, SYSTEM_REGISTRY_SERVICE, SERVICE_REGISTRY_SERVICE, ORCH_SERVICE
     }
 
     private Type system;

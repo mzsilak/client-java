@@ -17,6 +17,7 @@ import eu.arrowhead.client.common.misc.TypeSafeProperties;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.SocketException;
 import java.net.URI;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
@@ -79,8 +80,7 @@ public abstract class ArrowheadClientMain {
     }
   }
 
-  protected void parseArguments(final ClientType client, final String[] args)
-  {
+  protected void parseArguments(final ClientType client, final String[] args) {
     System.out.println("Working directory: " + System.getProperty("user.dir"));
     clientType = client;
     System.setProperty("client_type", clientType.toString());
@@ -101,7 +101,14 @@ public abstract class ArrowheadClientMain {
       }
     }
 
-    String address = props.getProperty("address", "0.0.0.0");
+    String address = props.getProperty("address");
+    try {
+      if ("0.0.0.0".equals(address)) {
+        address = Utility.getIpAddress();
+      }
+    } catch (SocketException e) {
+      // ignore
+    }
     int port = isSecure ? props.getIntProperty("secure_port", clientType.getSecurePort())
                         : props.getIntProperty("insecure_port", clientType.getInsecurePort());
     baseUri = Utility.getUri(address, port, null, isSecure, true);
@@ -195,8 +202,7 @@ public abstract class ArrowheadClientMain {
     }
   }
 
-  protected SSLContextConfigurator createSSLContextConfigurator()
-  {
+  protected SSLContextConfigurator createSSLContextConfigurator() {
     SSLContextConfigurator sslCon = new SSLContextConfigurator();
     sslCon.setKeyStoreFile(props.getProperty("keystore"));
     sslCon.setKeyStorePass(props.getProperty("keystorepass"));
