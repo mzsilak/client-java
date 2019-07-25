@@ -115,8 +115,7 @@ public final class Utility {
     if (isSecure && sslClient == null) {
       throw new AuthException(
           "SSL Context is not set, but secure request sending was invoked. An insecure module can not send requests "
-              + "to secure modules.",
-          Status.UNAUTHORIZED.getStatusCode());
+              + "to secure modules.", Status.UNAUTHORIZED.getStatusCode());
     }
     Client usedClient = isSecure ? givenContext != null ? createClient(givenContext) : sslClient : client;
 
@@ -292,8 +291,7 @@ public final class Utility {
     } catch (IOException e) {
       throw new ArrowheadException(
           "Jackson library threw IOException during JSON serialization! Wrapping it in RuntimeException. Exception "
-              + "message: "
-              + e.getMessage(), e);
+              + "message: " + e.getMessage(), e);
     }
     return null;
   }
@@ -337,10 +335,9 @@ public final class Utility {
       FileInputStream inputStream = new FileInputStream(file);
       prop.load(inputStream);
     } catch (FileNotFoundException ex) {
-      throw new ServiceConfigurationError(fileName
-                                              + " file not found, make sure you have the correct working directory "
-                                              + "set! (directory where the config folder can be found)",
-                                          ex);
+      throw new ServiceConfigurationError(
+          fileName + " file not found, make sure you have the correct working directory "
+              + "set! (directory where the config folder can be found)", ex);
     } catch (Exception ex) {
       ex.printStackTrace();
     }
@@ -412,6 +409,22 @@ public final class Utility {
       result = cause;
     }
     return result;
+  }
+
+  public static String getHardwareAddress(final InetAddress address) {
+    final StringBuilder sb = new StringBuilder();
+    final NetworkInterface network;
+    try {
+      network = NetworkInterface.getByInetAddress(address);
+      byte[] mac = network.getHardwareAddress();
+
+      for (int i = 0; i < mac.length; i++) {
+        sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
+      }
+    } catch (SocketException e) {
+      // ignored
+    }
+    return sb.toString();
   }
 
   /* If needed, this method can be used to get the IPv4 address of the host machine. Public point-to-point IP

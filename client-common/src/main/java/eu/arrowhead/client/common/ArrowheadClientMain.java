@@ -52,6 +52,8 @@ public abstract class ArrowheadClientMain {
   protected String base64PublicKey;
   protected HttpServer server;
   protected TypeSafeProperties props = Utility.getProp();
+  protected String ipAddress;
+  protected int port;
 
   private boolean daemon;
   private ClientType clientType;
@@ -109,7 +111,8 @@ public abstract class ArrowheadClientMain {
     } catch (SocketException e) {
       // ignore
     }
-    int port = isSecure ? props.getIntProperty("secure_port", clientType.getSecurePort())
+    this.ipAddress = address;
+    this.port = isSecure ? props.getIntProperty("secure_port", clientType.getSecurePort())
                         : props.getIntProperty("insecure_port", clientType.getInsecurePort());
     baseUri = Utility.getUri(address, port, null, isSecure, true);
   }

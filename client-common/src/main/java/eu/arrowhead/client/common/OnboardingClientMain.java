@@ -2,14 +2,23 @@ package eu.arrowhead.client.common;
 
 import eu.arrowhead.client.common.exception.ArrowheadException;
 import eu.arrowhead.client.common.exception.AuthException;
+import eu.arrowhead.client.common.exception.ExceptionType;
 import eu.arrowhead.client.common.misc.ClientType;
 import eu.arrowhead.client.common.misc.SecurityUtils;
+import eu.arrowhead.client.common.model.ArrowheadDevice;
+import eu.arrowhead.client.common.model.ArrowheadService;
+import eu.arrowhead.client.common.model.ArrowheadSystem;
+import eu.arrowhead.client.common.model.DeviceRegistryEntry;
 import eu.arrowhead.client.common.model.OnboardingResponse;
 import eu.arrowhead.client.common.model.OnboardingWithCertificateRequest;
+import eu.arrowhead.client.common.model.ServiceRegistryEntry;
 import eu.arrowhead.client.common.model.SystemEndpoint;
+import eu.arrowhead.client.common.model.SystemRegistryEntry;
 import java.io.ByteArrayInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.security.KeyFactory;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -23,6 +32,9 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import javax.net.ssl.SSLContext;
 import javax.ws.rs.core.Response;
@@ -192,6 +204,192 @@ public abstract class OnboardingClientMain extends ArrowheadClientMain {
           serviceRegUri = service.getUri().toString();
           break;
       }
+    }
+  }
+
+
+  protected SystemRegistryEntry compileSystemRegistrationPayload(final ArrowheadDevice device) {
+    final SystemRegistryEntry entry = new SystemRegistryEntry();
+    final ArrowheadSystem system = new ArrowheadSystem();
+
+    system.setAddress(ipAddress);
+    system.setPort(port);
+    system.setSystemName(props.getProperty("system_name"));
+
+    entry.setProvider(device);
+    entry.setProvidedSystem(system);
+    entry.setServiceURI(props.getProperty("service_uri"));
+
+    return entry;
+  }
+
+  protected DeviceRegistryEntry compileDeviceRegistrationPayload() {
+    final DeviceRegistryEntry entry = new DeviceRegistryEntry();
+    final ArrowheadDevice device = new ArrowheadDevice();
+
+    device.setDeviceName(props.getProperty("device_name"));
+
+    entry.setMacAddress(findMacAddress());
+    entry.setProvidedDevice(device);
+    return entry;
+  }
+
+  private String findMacAddress() {
+    try {
+      InetAddress address = InetAddress.getByName(ipAddress);
+      return Utility.getHardwareAddress(address);
+    } catch (UnknownHostException e) {
+      return null;
+    }
+  }
+
+
+  protected ServiceRegistryEntry compileServiceRegistrationPayload(final ArrowheadSystem system) {
+    //Compile the ArrowheadService (providedService)
+    String serviceDef = props.getProperty("service_name");
+    String serviceUri = props.getProperty("service_uri");
+    String interfaceList = props.getProperty("interfaces");
+    Set<String> interfaces = new HashSet<>();
+    if (interfaceList != null && !interfaceList.isEmpty()) {
+      //Interfaces are read from a comma separated list
+      interfaces.addAll(Arrays.asList(interfaceList.replaceAll("\\s+", "").split(",")));
+    }
+    Map<String, String> metadata = new HashMap<>();
+    String metadataString = props.getProperty("metadata");
+    if (metadataString != null && !metadataString.isEmpty()) {
+      //Metadata in the properties file: key1-value1, key2-value2, ...
+      String[] parts = metadataString.split(",");
+      for (String part : parts) {
+        String[] pair = part.split("-");
+        metadata.put(pair[0], pair[1]);
+      }
+    }
+    ArrowheadService service = new ArrowheadService(serviceDef, interfaces, metadata);
+
+    //Return the complete request payload
+    return new ServiceRegistryEntry(service, system, serviceUri);
+  }
+
+  private void registerToServiceRegistry(ServiceRegistryEntry entry) {
+    //Create the full URL (appending "register" to the base URL)
+
+    //Send the registration request
+    try {
+      Utility.sendRequest(serviceRegUri, "POST", entry);
+    } catch (ArrowheadException e) {
+      /*
+        Service Registry might return duplicate entry exception, if a previous instance of the web server already
+        registered this service,
+        and the deregistration did not happen. It's better to unregister the old entry, in case the request payload
+        changed.
+       */
+      if (e.getExceptionType() == ExceptionType.DUPLICATE_ENTRY) {
+        System.out
+            .println("Received DuplicateEntryException from SR, sending delete request and then registering again.");
+        unregisterFromServiceRegistry(entry);
+        Utility.sendRequest(serviceRegUri, "POST", entry);
+      } else {
+        throw e;
+      }
+    }
+    System.out.println("Registering service is successful!");
+  }
+
+  private void unregisterFromServiceRegistry(ServiceRegistryEntry entry) {
+    //Create the full URL (appending "remove" to the base URL)
+    String removeUri = serviceRegUri.replace("register", "remove");
+    Utility.sendRequest(removeUri, "PUT", entry);
+    System.out.println("Removing service is successful!");
+  }
+
+
+  protected <T> T register(final T o, final String url) {
+    return register(o, url, "publish", "unpublish");
+  }
+
+  protected <T> T register(final T o, final String url, final String suffix, final String errorSuffix) {
+    final String registerUri = UriBuilder.fromPath(url).toString();
+    Response response;
+    T entity;
+
+    //Send the registration request
+    try {
+      response = Utility.sendRequest(registerUri, "POST", o);
+      entity = (T) response.readEntity(o.getClass());
+    } catch (ArrowheadException e) {
+      /*
+        Service Registry might return duplicate entry exception, if a previous instance of the web server already
+        registered this service,
+        and the deregistration did not happen. It's better to unregister the old entry, in case the request payload
+        changed.
+       */
+      if (e.getExceptionType() == ExceptionType.DUPLICATE_ENTRY) {
+        logger.info("Received DuplicateEntryException from SR, sending delete request and then registering again.");
+        unregister(o, url, suffix, errorSuffix);
+        response = Utility.sendRequest(registerUri, "POST", o);
+        entity = (T) response.readEntity(o.getClass());
+      } else {
+        throw e;
+      }
+    }
+    logger.info("Registration successful!");
+    return entity;
+  }
+
+  protected <T> T registerService(final T o, final String url, final String suffix, final String errorSuffix) {
+    final String registerUri = UriBuilder.fromPath(url).toString();
+    Response response;
+    T entity;
+
+    //Send the registration request
+    try {
+      response = Utility.sendRequest(registerUri, "POST", o);
+      entity = (T) response.readEntity(o.getClass());
+    } catch (ArrowheadException e) {
+      /*
+        Service Registry might return duplicate entry exception, if a previous instance of the web server already
+        registered this service,
+        and the deregistration did not happen. It's better to unregister the old entry, in case the request payload
+        changed.
+       */
+      if (e.getExceptionType() == ExceptionType.DUPLICATE_ENTRY) {
+        logger.info("Received DuplicateEntryException from SR, sending delete request and then registering again.");
+        unregisterService(o, url, suffix, errorSuffix);
+        response = Utility.sendRequest(registerUri, "POST", o);
+        entity = (T) response.readEntity(o.getClass());
+      } else {
+        throw e;
+      }
+    }
+    logger.info("Registration successful!");
+    return entity;
+  }
+
+  protected void unregister(final Object o, final String url) {
+    unregister(o, url, "publish", "unpublish");
+  }
+
+  protected void unregister(final Object o, final String url, final String suffix, final String errorSuffix) {
+    try {
+
+      String removeUri = url.replace(suffix, errorSuffix).toString();
+      logger.debug("Contacting {}", removeUri);
+      Utility.sendRequest(removeUri, "POST", o);
+      logger.info("Removed object successfully!");
+    } catch (Exception ex) {
+      logger.warn("Unknown exception during unregister: {}", ex.getMessage());
+    }
+  }
+
+  protected void unregisterService(final Object o, final String url, final String suffix, final String errorSuffix) {
+    try {
+
+      String removeUri = url.replace(suffix, errorSuffix).toString();
+      logger.debug("Contacting {}", removeUri);
+      Utility.sendRequest(removeUri, "PUT", o);
+      logger.info("Removed object successfully!");
+    } catch (Exception ex) {
+      logger.warn("Unknown exception during unregister: {}", ex.getMessage());
     }
   }
 
