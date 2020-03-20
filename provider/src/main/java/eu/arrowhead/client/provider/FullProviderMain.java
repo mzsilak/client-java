@@ -7,7 +7,7 @@
  *  national funding authorities from involved countries.
  */
 
-package eu.arrowhead.client.provider;
+package eu.arrowhead.client.car;
 
 import eu.arrowhead.client.common.ArrowheadClientMain;
 import eu.arrowhead.client.common.Utility;

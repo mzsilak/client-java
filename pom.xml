@@ -11,106 +11,135 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>2.1.5.RELEASE</version>
+    <relativePath/> <!-- lookup parent from repository -->
+  </parent>
+
   <modelVersion>4.0.0</modelVersion>
   <groupId>eu.arrowhead</groupId>
   <artifactId>arrowheadclient</artifactId>
-  <version>4.0</version>
+  <version>4.1.3</version>
   <packaging>pom</packaging>
 
   <modules>
+    <module>core-client-skeleton</module>
     <module>GrovePi-spec</module>
     <module>GrovePi-pi4j</module>
-    <module>client-common</module>
-    <module>consumer</module>
-    <module>provider</module>
-    <module>publisher</module>
-    <module>subscriber</module>
-      <module>demo-common</module>
+    <module>demo-common</module>
+    <module>eisenstadt-demo-car</module>
+    <module>eisenstadt-demo-station</module>
   </modules>
 
   <properties>
-    <mvn.compiler.version>3.8.0</mvn.compiler.version>
-    <mvn.compile.target>1.8</mvn.compile.target>
-    <bouncy.version>1.59</bouncy.version>
-    <jackson.version>2.9.7</jackson.version>
-    <javax.servlet.version>4.0.1</javax.servlet.version>
-    <jersey.version>2.27</jersey.version>
+    <base.version>4.1.3</base.version>
+    <revision>${base.version}</revision>
+    <java.version>11</java.version>
+    <mvn.clean.version>3.1.0</mvn.clean.version>
+    <mvn.compiler.version>3.8.1</mvn.compiler.version>
+    <mvn.compile.target>11</mvn.compile.target>
+    <mvn.dependency.version>3.1.1</mvn.dependency.version>
+    <mvn.jar.version>3.1.2</mvn.jar.version>
+    <mvn.resources.version>3.1.0</mvn.resources.version>
+    <swagger.version>2.9.2</swagger.version>
+    <disruptor.version>3.3.6</disruptor.version>
+    <http.client.version>4.5.8</http.client.version>
+    <jose4j.version>0.6.5</jose4j.version>
+    <apache.commons.lang3.version>3.9</apache.commons.lang3.version>
+    <jms.api.version>2.0.1</jms.api.version>
+    <bouncy.castle.version>1.64</bouncy.castle.version>
+    <icmp4j.version>1.2</icmp4j.version>
+    <jna.version>5.5.0</jna.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
-  <dependencyManagement>
-    <dependencies>
+  <repositories>
+    <repository>
+      <id>spring-repo</id>
+      <name>Spring Repository</name>
+      <url>https://repo.spring.io/plugins-release/</url>
+    </repository>
+  </repositories>
 
-      <dependency>
-        <groupId>com.fasterxml.jackson.jaxrs</groupId>
-        <artifactId>jackson-jaxrs-json-provider</artifactId>
-        <version>${jackson.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.fasterxml.jackson.datatype</groupId>
-        <artifactId>jackson-datatype-jsr310</artifactId>
-        <version>${jackson.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>eu.arrowhead</groupId>
-        <artifactId>client-common</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>javax.servlet</groupId>
-        <artifactId>javax.servlet-api</artifactId>
-        <version>${javax.servlet.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.bouncycastle</groupId>
-        <artifactId>bcprov-jdk15on</artifactId>
-        <version>${bouncy.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.bouncycastle</groupId>
-        <artifactId>bcpkix-jdk15on</artifactId>
-        <version>${bouncy.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.glassfish.jersey</groupId>
-        <artifactId>jersey-bom</artifactId>
-        <version>${jersey.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-
-      <!-- Next 3 dependency needed for Java 11 compatibility -->
-
-      <dependency>
-        <groupId>com.sun.xml.bind</groupId>
-        <artifactId>jaxb-impl</artifactId>
-        <version>2.3.1</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.sun.istack</groupId>
-        <artifactId>istack-commons-runtime</artifactId>
-        <version>3.0.7</version>
-      </dependency>
-
-      <dependency>
-        <groupId>javax.xml.bind</groupId>
-        <artifactId>jaxb-api</artifactId>
-        <version>2.3.1</version>
-      </dependency>
-
-    </dependencies>
-  </dependencyManagement>
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-logging</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-log4j2</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-integration</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-quartz</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-security</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-configuration-processor</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>com.lmax</groupId>
+      <artifactId>disruptor</artifactId>
+      <version>${disruptor.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+      <version>${http.client.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.bitbucket.b_c</groupId>
+      <artifactId>jose4j</artifactId>
+      <version>${jose4j.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>${apache.commons.lang3.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 
   <build>
     <defaultGoal>clean install</defaultGoal>
     <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>${mvn.compiler.version}</version>
@@ -119,7 +148,54 @@
           <target>${mvn.compile.target}</target>
         </configuration>
       </plugin>
+
+      <plugin>
+        <groupId>pl.project13.maven</groupId>
+        <artifactId>git-commit-id-plugin</artifactId>
+        <version>2.2.6</version>
+        <executions>
+          <execution>
+            <id>get-the-git-infos</id>
+            <goals>
+              <goal>revision</goal>
+            </goals>
+            <phase>initialize</phase>
+          </execution>
+          <execution>
+            <id>validate-the-git-infos</id>
+            <goals>
+              <goal>validateRevision</goal>
+            </goals>
+            <phase>package</phase>
+          </execution>
+          <execution>
+            <goals>
+              <goal>revision</goal>
+            </goals>
+            <phase>validate</phase>
+          </execution>
+        </executions>
+
+        <configuration>
+          <injectAllReactorProjects>true</injectAllReactorProjects>
+          <dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
+          <prefix>git</prefix>
+          <dateFormat>dd-MM-yyyy'T'HH:mm:ssZ</dateFormat>
+          <dateFormatTimeZone>${user.timezone}</dateFormatTimeZone>
+          <verbose>false</verbose>
+          <generateGitPropertiesFile>false</generateGitPropertiesFile>
+          <skipPoms>false</skipPoms>
+          <failOnNoGitDirectory>false</failOnNoGitDirectory>
+          <failOnUnableToExtractRepoInfo>true</failOnUnableToExtractRepoInfo>
+          <runOnlyOnce>false</runOnlyOnce>
+          <excludeProperties>
+            <excludeProperty>git.user.*</excludeProperty>
+          </excludeProperties>
+          <includeOnlyProperties>
+          </includeOnlyProperties>
+          <abbrevLength>7</abbrevLength>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
-
 </project>

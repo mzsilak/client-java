@@ -1,10 +1,15 @@
 package org.iot.raspberry.grovepi.devices;
 
+import static org.iot.raspberry.grovepi.GrovePiCommands.aWrite_cmd;
+import static org.iot.raspberry.grovepi.GrovePiCommands.dWrite_cmd;
+import static org.iot.raspberry.grovepi.GrovePiCommands.pMode_cmd;
+import static org.iot.raspberry.grovepi.GrovePiCommands.pMode_out_arg;
+import static org.iot.raspberry.grovepi.GrovePiCommands.unused;
+
 import java.io.IOException;
 import org.iot.raspberry.grovepi.GroveDigitalPin;
 import org.iot.raspberry.grovepi.GroveIO;
 import org.iot.raspberry.grovepi.GrovePi;
-import static org.iot.raspberry.grovepi.GrovePiCommands.*;
 
 @GroveDigitalPin
 public class GroveLed {
@@ -21,13 +26,13 @@ public class GroveLed {
     set(false);
   }
 
-  public final void set(boolean value) throws IOException {
+  public void set(boolean value) throws IOException {
     int val = value ? 1 : 0;
     grovePi.execVoid((GroveIO io) -> io.write(dWrite_cmd, pin, val, unused));
   }
 
-  public final void set(int value) throws IOException {
-    final int val = ((value > 255) ? 255 : (value < 0 ? 0 : value));
+  public void set(int value) throws IOException {
+    final int val = Math.max(0, Math.min(value, MAX_BRIGTHNESS));
     grovePi.execVoid((GroveIO io) -> io.write(aWrite_cmd, pin, val, unused));
   }
 

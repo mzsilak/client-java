@@ -1,4 +1,4 @@
-package eu.arrowhead.client.provider;
+package eu.arrowhead.client.car;
 
 import eu.arrowhead.client.common.exception.DataNotFoundException;
 import eu.arrowhead.client.common.model.Car;

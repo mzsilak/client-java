@@ -6,6 +6,9 @@
         </Console>
     </Appenders>
     <Loggers>
+        <Logger name="org.springframework" level="debug" additivity="true"/>
+        <Logger name="org.springframework.boot.autoconfigure" level="info" additivity="true"/>
+
         <Root level="debug">
             <AppenderRef ref="Console" />
         </Root>

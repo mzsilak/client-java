@@ -89,7 +89,7 @@
             </manifestEntries>
             <manifest>
               <addClasspath>true</addClasspath>
-              <mainClass>eu.arrowhead.client.provider.BlueLedService</mainClass>
+              <mainClass>eu.arrowhead.client.car.BlueLedService</mainClass>
               <classpathPrefix>lib/</classpathPrefix>
             </manifest>
           </archive>

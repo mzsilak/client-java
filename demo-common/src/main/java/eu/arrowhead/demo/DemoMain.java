@@ -22,9 +22,9 @@ public class DemoMain
     private double previousRotaryValue;
     private boolean toogle;
 
-    public static void main(final String[] args) throws IOException {
-        DemoMain main = new DemoMain();
-    }
+    //public static void main(final String[] args) throws IOException {
+    //    DemoMain main = new DemoMain();
+    //}
 
     public DemoMain() throws IOException {
         this.grovePi = new GrovePi4J();

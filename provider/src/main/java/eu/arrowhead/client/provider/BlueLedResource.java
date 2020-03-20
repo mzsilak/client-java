@@ -7,7 +7,7 @@
  *  national funding authorities from involved countries.
  */
 
-package eu.arrowhead.client.provider;
+package eu.arrowhead.client.car;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
