@@ -20,9 +20,9 @@
   </dependencies>
 
   <parent>
-    <artifactId>arrowheadclient</artifactId>
+    <artifactId>eisenstadt-demo</artifactId>
     <groupId>eu.arrowhead</groupId>
-    <version>4.1.3</version>
+    <version>1.0.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>core-client-skeleton</artifactId>

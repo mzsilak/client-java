@@ -12,9 +12,9 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <artifactId>arrowheadclient</artifactId>
+    <artifactId>eisenstadt-demo</artifactId>
     <groupId>eu.arrowhead</groupId>
-    <version>4.1.3</version>
+    <version>1.0.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>eisenstadt-demo-station</artifactId>

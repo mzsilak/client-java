@@ -8,11 +8,18 @@ import eu.arrowhead.common.dto.shared.DeviceRegistryRequestDTO;
 import eu.arrowhead.common.dto.shared.DeviceRegistryResponseDTO;
 import eu.arrowhead.common.dto.shared.OnboardingWithNameRequestDTO;
 import eu.arrowhead.common.dto.shared.OnboardingWithNameResponseDTO;
+import eu.arrowhead.common.dto.shared.OrchestrationFlags;
+import eu.arrowhead.common.dto.shared.OrchestrationFormRequestDTO;
+import eu.arrowhead.common.dto.shared.OrchestrationResponseDTO;
 import eu.arrowhead.common.dto.shared.ServiceEndpoint;
+import eu.arrowhead.common.dto.shared.ServiceQueryFormDTO;
+import eu.arrowhead.common.dto.shared.ServiceQueryResultDTO;
 import eu.arrowhead.common.dto.shared.ServiceRegistryRequestDTO;
 import eu.arrowhead.common.dto.shared.ServiceRegistryResponseDTO;
 import eu.arrowhead.common.dto.shared.SystemRegistryRequestDTO;
 import eu.arrowhead.common.dto.shared.SystemRegistryResponseDTO;
+import eu.arrowhead.common.dto.shared.SystemRequestDTO;
+import eu.arrowhead.common.exception.ArrowheadException;
 import eu.arrowhead.demo.ssl.SSLException;
 import java.io.IOException;
 import java.net.URI;
@@ -32,11 +39,11 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @Component
-public class OnboardingHandler {
+public class ArrowheadHandler {
 
-    private final Logger logger = LogManager.getLogger(OnboardingHandler.class);
+    private final Logger logger = LogManager.getLogger(ArrowheadHandler.class);
 
-    private final HttpHandler httpService;
+    private final HttpClient httpClient;
     private final SSLHandler sslHandler;
     private final String onboardingHost;
 
@@ -46,9 +53,9 @@ public class OnboardingHandler {
     private ServiceEndpoint orchestrationService;
 
     @Autowired
-    public OnboardingHandler(final HttpHandler httpService, final SSLHandler sslHandler,
-                             @Value("${onboarding.host}") final String onboardingHost) {
-        this.httpService = httpService;
+    public ArrowheadHandler(final HttpClient httpClient, final SSLHandler sslHandler,
+                            @Value("${onboarding.host}") final String onboardingHost) {
+        this.httpClient = httpClient;
         this.sslHandler = sslHandler;
         this.onboardingHost = onboardingHost;
     }
@@ -58,13 +65,13 @@ public class OnboardingHandler {
                IOException, SSLException {
 
         logger.info("Starting onboarding for {}", onboardingRequest);
-        httpService.setInsecure();
+        httpClient.setInsecure();
 
         final UriComponents onboardingUri = Utilities
             .createURI(CommonConstants.HTTPS, onboardingHost, CoreSystem.ONBOARDING_CONTROLLER.getDefaultPort(),
                        CoreSystemService.ONBOARDING_WITH_SHARED_SECRET_AND_NAME.getServiceUri());
 
-        final ResponseEntity<OnboardingWithNameResponseDTO> httpResponse = httpService
+        final ResponseEntity<OnboardingWithNameResponseDTO> httpResponse = httpClient
             .sendRequest(onboardingUri, HttpMethod.POST, OnboardingWithNameResponseDTO.class, onboardingRequest);
 
         final OnboardingWithNameResponseDTO responseDTO = httpResponse.getBody();
@@ -80,7 +87,7 @@ public class OnboardingHandler {
                                    responseDTO.getCertificateType(), responseDTO.getOnboardingCertificate(),
                                    responseDTO.getIntermediateCertificate(), responseDTO.getRootCertificate());
 
-        httpService.setSecure();
+        httpClient.setSecure();
     }
 
     public String getAuthInfo() {
@@ -93,7 +100,7 @@ public class OnboardingHandler {
 
     private <REQ, RES> RES register(final REQ registryRequest, final Class<RES> responseCls, final URI uri) {
         final UriComponents registryUri = UriComponentsBuilder.fromUri(uri).build();
-        final ResponseEntity<RES> responseEntity = httpService
+        final ResponseEntity<RES> responseEntity = httpClient
             .sendRequest(registryUri, HttpMethod.POST, responseCls, registryRequest);
         return responseEntity.getBody();
     }
@@ -112,7 +119,7 @@ public class OnboardingHandler {
                 CommonConstants.DEVICE_REGISTRY_URI + CommonConstants.OP_DEVICE_REGISTRY_UNREGISTER_URI);
             addNonNull(builder, "device_name", deviceName);
             addNonNull(builder, "mac_address", macAddress);
-            httpService.sendRequest(builder.build(), HttpMethod.DELETE, null);
+            httpClient.sendRequest(builder.build(), HttpMethod.DELETE, null);
         } catch (final Exception ex) {
             // ignore
         }
@@ -131,7 +138,7 @@ public class OnboardingHandler {
             addNonNull(builder, "system_name", systemName);
             addNonNull(builder, "address", address);
             addNonNull(builder, "port", port);
-            httpService.sendRequest(builder.build(), HttpMethod.DELETE, null);
+            httpClient.sendRequest(builder.build(), HttpMethod.DELETE, null);
         } catch (final Exception ex) {
             // ignore
         }
@@ -146,14 +153,62 @@ public class OnboardingHandler {
             addNonNull(builder, "system_name", systemName);
             addNonNull(builder, "address", address);
             addNonNull(builder, "port", port);
-            httpService.sendRequest(builder.build(), HttpMethod.DELETE, null);
+            httpClient.sendRequest(builder.build(), HttpMethod.DELETE, null);
         } catch (final Exception ex) {
             // ignore
         }
     }
 
+    public OrchestrationResponseDTO lookupOrchestration(final ServiceQueryFormDTO queryFormDTO,
+                                                        final SystemRequestDTO requester) {
+        final OrchestrationFormRequestDTO orchForm = new OrchestrationFormRequestDTO.Builder(requester)
+            .requestedService(queryFormDTO).flag(OrchestrationFlags.Flag.OVERRIDE_STORE, true).build();
+
+        final ResponseEntity<OrchestrationResponseDTO> httpResponse = httpClient
+            .sendRequest(orchestrationUri(), HttpMethod.POST, OrchestrationResponseDTO.class, orchForm);
+        final OrchestrationResponseDTO orchQueryResult = httpResponse.getBody();
+
+        if (Objects.isNull(orchQueryResult) || orchQueryResult.getResponse().isEmpty()) {
+            throw new ArrowheadException("Unable to find " + queryFormDTO.getServiceDefinitionRequirement());
+        }
+
+        return orchQueryResult;
+    }
+
     public UriComponents orchestrationUri() {
         return UriComponentsBuilder.fromUri(orchestrationService.getUri()).build();
+    }
+
+    public UriComponents createUri(final String serviceDef) {
+        final ServiceQueryFormDTO serviceQueryFormDTO = new ServiceQueryFormDTO.Builder(serviceDef)
+            .interfaces(CommonConstants.HTTP_SECURE_JSON).build();
+        return createUri(serviceQueryFormDTO);
+    }
+
+    public UriComponents createUri(final ServiceQueryFormDTO serviceQueryFormDTO) {
+        final ServiceQueryResultDTO serviceQueryResultDTO = lookupServiceRegistry(serviceQueryFormDTO);
+        final ServiceRegistryResponseDTO responseDto = serviceQueryResultDTO.getServiceQueryData().get(0);
+        return createUri(responseDto);
+    }
+
+    public UriComponents createUri(final ServiceRegistryResponseDTO srResponseDto) {
+        return Utilities.createURI(httpClient.getScheme(), srResponseDto.getProvider().getAddress(),
+                                   srResponseDto.getProvider().getPort(), srResponseDto.getServiceUri());
+    }
+
+    public ServiceQueryResultDTO lookupServiceRegistry(final ServiceQueryFormDTO srQueryForm) {
+        final UriComponents srQueryUri = UriComponentsBuilder.fromUri(serviceRegistry.getUri()).replacePath(
+            CommonConstants.SERVICE_REGISTRY_URI + CommonConstants.OP_SERVICE_REGISTRY_QUERY_URI).build();
+
+        final ResponseEntity<ServiceQueryResultDTO> httpResponse = httpClient
+            .sendRequest(srQueryUri, HttpMethod.POST, ServiceQueryResultDTO.class, srQueryForm);
+        final ServiceQueryResultDTO srQueryResult = httpResponse.getBody();
+
+        if (Objects.isNull(srQueryResult) || srQueryResult.getServiceQueryData().isEmpty()) {
+            throw new ArrowheadException("Unable to find service");
+        }
+
+        return srQueryResult;
     }
 
 }

@@ -9,18 +9,15 @@ import eu.arrowhead.common.dto.shared.ServiceRegistryRequestDTO;
 import eu.arrowhead.common.dto.shared.ServiceSecurityType;
 import eu.arrowhead.common.dto.shared.SystemRegistryRequestDTO;
 import eu.arrowhead.common.dto.shared.SystemRequestDTO;
-import eu.arrowhead.common.http.HttpService;
 import eu.arrowhead.demo.dto.Constants;
 import eu.arrowhead.demo.events.OffboardingFinishedEvent;
 import eu.arrowhead.demo.events.OnboardingFinishedEvent;
 import eu.arrowhead.demo.grovepi.ControllableLed;
-import eu.arrowhead.demo.onboarding.HttpClient;
 import eu.arrowhead.demo.onboarding.ArrowheadHandler;
 import eu.arrowhead.demo.ssl.SSLException;
 import eu.arrowhead.demo.utils.IpUtilities;
 import eu.arrowhead.demo.web.HttpServer;
 import java.io.IOException;
-import java.net.SocketException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
@@ -46,7 +43,6 @@ public class ChargingStationApplication {
     private final HttpServer httpServer;
 
     private final ArrowheadHandler onboardingHandler;
-    private final HttpService httpClient;
     private final String commonName;
 
     private final ControllableLed green;
@@ -55,7 +51,7 @@ public class ChargingStationApplication {
     @Autowired
     public ChargingStationApplication(final ApplicationEventPublisher applicationEventPublisher,
                                       final HttpServer httpServer, final ArrowheadHandler onboardingHandler,
-                                      final HttpClient httpClient, @Value("${server.name}") final String commonName,
+                                      @Value("${server.name}") final String commonName,
                                       @Qualifier("greenControl") final ControllableLed green,
                                       @Qualifier("redControl") final ControllableLed red)
         throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException, SSLException,
@@ -63,7 +59,6 @@ public class ChargingStationApplication {
         this.applicationEventPublisher = applicationEventPublisher;
         this.httpServer = httpServer;
         this.onboardingHandler = onboardingHandler;
-        this.httpClient = httpClient;
         this.commonName = commonName;
         this.green = green;
         this.red = red;
@@ -71,6 +66,35 @@ public class ChargingStationApplication {
         httpServer.configureName(commonName);
         onboardingHandler.performOnboarding(new OnboardingWithNameRequestDTO(commonName));
         performOffboarding();
+    }
+
+    @PreDestroy
+    public void performOffboarding() {
+        try {
+            httpServer.stop();
+            green.blink();
+            red.blink();
+
+            final String ipAddress = IpUtilities.getIpAddress();
+            final String macAddress = IpUtilities.getMacAddress();
+            final int port = httpServer.getPort();
+
+            onboardingHandler.unregisterService(Constants.SERVICE_STATION_CHARGE, commonName, ipAddress, port);
+            onboardingHandler.unregisterService(Constants.SERVICE_STATION_REGISTER, commonName, ipAddress, port);
+            onboardingHandler.unregisterService(Constants.SERVICE_STATION_UNREGISTER, commonName, ipAddress, port);
+            onboardingHandler.unregisterSystem(commonName, ipAddress, port);
+            onboardingHandler.unregisterDevice(commonName, macAddress);
+
+            stopLeds();
+        } catch (final Exception e) {
+            logger.warn("Issues during offboarding: {}", e.getMessage());
+        }
+    }
+
+    @EventListener(OffboardingFinishedEvent.class)
+    public void stopLeds() {
+        green.turnOff();
+        red.turnOff();
     }
 
     @EventListener(ApplicationReadyEvent.class)
@@ -105,29 +129,6 @@ public class ChargingStationApplication {
         }
     }
 
-    @PreDestroy
-    public void performOffboarding() {
-        try {
-            httpServer.stop();
-            green.blink();
-            red.blink();
-
-            final String ipAddress = IpUtilities.getIpAddress();
-            final String macAddress = IpUtilities.getMacAddress();
-            final int port = httpServer.getPort();
-
-            onboardingHandler.unregisterService(Constants.SERVICE_STATION_CHARGE, commonName, ipAddress, port);
-            onboardingHandler.unregisterService(Constants.SERVICE_STATION_REGISTER, commonName, ipAddress, port);
-            onboardingHandler.unregisterService(Constants.SERVICE_STATION_UNREGISTER, commonName, ipAddress, port);
-            onboardingHandler.unregisterSystem(commonName, ipAddress, port);
-            onboardingHandler.unregisterDevice(commonName, macAddress);
-
-            stopLeds();
-        } catch (final Exception e) {
-            logger.warn("Issues during offboarding: {}", e.getMessage());
-        }
-    }
-
     private DeviceRegistryRequestDTO getDeviceRegistryRequest(String ipAddress, String macAddress, String validity,
                                                               String authInfo) {
 
@@ -142,7 +143,7 @@ public class ChargingStationApplication {
 
     private ServiceRegistryRequestDTO getServiceRegistryRequest(String ipAddress, final int port, final String validity,
                                                                 final String authInfo, final String uriPostfix,
-                                                                final String serviceDef) throws SocketException {
+                                                                final String serviceDef) {
         final ServiceRegistryRequestDTO requestDTO = new ServiceRegistryRequestDTO();
         requestDTO.setSecure(ServiceSecurityType.CERTIFICATE.name());
         requestDTO.setServiceUri(Constants.STATION_CONTROLLER_PATH + uriPostfix);
@@ -151,12 +152,6 @@ public class ChargingStationApplication {
         requestDTO.setProviderSystem(getSystemRequest(ipAddress, port, authInfo));
         requestDTO.setServiceDefinition(serviceDef);
         return requestDTO;
-    }
-
-    @EventListener(OffboardingFinishedEvent.class)
-    public void stopLeds() {
-        green.turnOff();
-        red.turnOff();
     }
 
     private DeviceRequestDTO getDeviceRequest(String ipAddress, String macAddress, String authInfo) {

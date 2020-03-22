@@ -12,9 +12,9 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <artifactId>arrowheadclient</artifactId>
+    <artifactId>eisenstadt-demo</artifactId>
     <groupId>eu.arrowhead</groupId>
-    <version>4.1.3</version>
+    <version>1.0.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>eisenstadt-demo-car</artifactId>
@@ -23,12 +23,12 @@
   <dependencies>
     <dependency>
       <groupId>eu.arrowhead</groupId>
-      <artifactId>demo-common</artifactId>
+      <artifactId>core-client-skeleton</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>eu.arrowhead</groupId>
-      <artifactId>core-client-skeleton</artifactId>
+      <artifactId>demo-common</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>
