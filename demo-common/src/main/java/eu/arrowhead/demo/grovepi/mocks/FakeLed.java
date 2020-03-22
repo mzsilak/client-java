@@ -8,12 +8,10 @@ import org.iot.raspberry.grovepi.devices.GroveLed;
 
 public class FakeLed extends GroveLed {
 
-  private final Logger logger = LogManager.getLogger();
-  private final int pin;
+    private static final Logger logger = LogManager.getLogger();
 
   public FakeLed(GrovePi grovePi, int pin) throws IOException {
     super(grovePi, pin);
-    this.pin = pin;
   }
 
   @Override

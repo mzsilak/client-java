@@ -1,21 +1,35 @@
-/.idea/
+!.mvn/wrapper/maven-wrapper.jar
 
-/client-common/client-common.iml
+### STS ###
+.apt_generated
+.factorypath
+.sts4-cache
 
-/consumer/config/app.properties
-/consumer/target/
-/consumer/consumer.iml
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
 
-/provider/config/app.properties
-/provider/target/
-/provider/provider.iml
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+/build/
 
-/publisher/config/app.properties
-/publisher/target/
-/publisher/publisher.iml
+### VS Code ###
+.vscode/
+wrapper
+/target
+/**/target
+/mvnw
+/mvnw.cmd
+/.settings
+/**/.settings
+*.prefs
+/*.log
+/**/*.log
 
-/subscriber/config/app.properties
-/subscriber/target/
-/subscriber/subscriber.iml
-
-/arrowheadclient.iml
+/.metadata/

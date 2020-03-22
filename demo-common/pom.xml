@@ -18,11 +18,6 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.bouncycastle</groupId>
-      <artifactId>bcprov-jdk15on</artifactId>
-      <version>${bouncy.castle.version}</version>
-    </dependency>
-    <dependency>
       <groupId>org.iot.raspberry</groupId>
       <artifactId>GrovePi-spec</artifactId>
       <version>0.1.0-SNAPSHOT</version>

@@ -14,7 +14,6 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
-import javax.el.MethodNotFoundException;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 import javax.security.auth.x500.X500Principal;
@@ -123,7 +122,8 @@ public class HttpService {
 		}
 		
 		if (NOT_SUPPORTED_METHODS.contains(method)) {
-			throw new MethodNotFoundException("Invalid method type was given to the HttpService.sendRequest() method.");
+			throw new UnsupportedOperationException("Invalid method type was given to the HttpService.sendRequest() method"
+																								+ ".");
 		}
 		
 		final boolean secure = CommonConstants.HTTPS.equalsIgnoreCase(uri.getScheme());

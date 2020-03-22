@@ -9,38 +9,38 @@ import org.iot.raspberry.grovepi.devices.GroveLed;
 
 public class BlinkingLedRunnable implements Runnable {
 
-  private final Logger logger = LogManager.getLogger();
-  private final AtomicBoolean running = new AtomicBoolean(false);
-  private final ExecutorService executorService;
-  private final GroveLed led;
-  private boolean state = false;
+    private final Logger logger = LogManager.getLogger();
+    private final AtomicBoolean running = new AtomicBoolean(false);
+    private final ExecutorService executorService;
+    private final GroveLed led;
+    private boolean state = false;
 
-  public BlinkingLedRunnable(final ExecutorService executorService, final GroveLed led) {
-    this.executorService = executorService;
-    this.led = led;
-  }
-
-  public synchronized void start() {
-    if (running.compareAndExchange(false, true)) {
-      executorService.submit(this);
+    public BlinkingLedRunnable(final ExecutorService executorService, final GroveLed led) {
+        this.executorService = executorService;
+        this.led = led;
     }
-  }
 
-  public synchronized void stop() {
-    running.set(false);
-  }
+    public synchronized void start() {
+        if (running.compareAndExchange(false, true)) {
+            executorService.execute(this);
+        }
+    }
 
-  @Override
-  public void run() {
-    while (running.get()) {
-      try {
-        state = !state;
-        led.set(state);
-        Thread.sleep(500L);
-      } catch (IOException | InterruptedException e) {
+    public synchronized void stop() {
         running.set(false);
-        logger.error(e.getMessage());
-      }
     }
-  }
+
+    @Override
+    public void run() {
+        while (running.get()) {
+            try {
+                state = !state;
+                led.set(state);
+                Thread.sleep(500L);
+            } catch (IOException | InterruptedException e) {
+                running.set(false);
+                logger.error(e.getMessage());
+            }
+        }
+    }
 }

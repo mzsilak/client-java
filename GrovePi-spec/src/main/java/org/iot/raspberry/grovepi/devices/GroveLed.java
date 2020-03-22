@@ -17,7 +17,7 @@ public class GroveLed {
   public static int MAX_BRIGTHNESS = 255;
 
   private final GrovePi grovePi;
-  private final int pin;
+    protected final int pin;
 
   public GroveLed(GrovePi grovePi, int pin) throws IOException {
     this.grovePi = grovePi;
