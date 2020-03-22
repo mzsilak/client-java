@@ -21,7 +21,7 @@ public class BlinkingLedRunnable implements Runnable {
     }
 
     public synchronized void start() {
-        if (running.compareAndExchange(false, true)) {
+        if (!running.compareAndExchange(false, true)) {
             executorService.execute(this);
         }
     }

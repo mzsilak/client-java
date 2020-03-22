@@ -26,8 +26,12 @@
       <artifactId>demo-common</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>eu.arrowhead</groupId>
+      <artifactId>core-client-skeleton</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
-
 
   <build>
     <plugins>

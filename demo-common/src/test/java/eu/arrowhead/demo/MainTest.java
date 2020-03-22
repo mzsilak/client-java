@@ -3,7 +3,7 @@ package eu.arrowhead.demo;
 import eu.arrowhead.common.CommonConstants;
 import eu.arrowhead.common.dto.shared.CertificateCreationRequestDTO;
 import eu.arrowhead.common.dto.shared.OnboardingWithNameRequestDTO;
-import eu.arrowhead.demo.onboarding.OnboardingHandler;
+import eu.arrowhead.demo.onboarding.ArrowheadHandler;
 import eu.arrowhead.demo.ssl.SSLException;
 import java.io.IOException;
 import java.security.KeyStoreException;
@@ -15,13 +15,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication(scanBasePackages = CommonConstants.BASE_PACKAGE)
 public class MainTest {
 
   @Autowired
-  private OnboardingHandler onboardingHandler;
+  private ArrowheadHandler onboardingHandler;
 
   @Value("${server.name}")
   private String clientName;
