@@ -8,15 +8,14 @@ import eu.arrowhead.demo.events.OnboardingFinishedEvent;
 import eu.arrowhead.demo.grovepi.ControllableLed;
 import eu.arrowhead.demo.onboarding.ArrowheadHandler;
 import eu.arrowhead.demo.onboarding.HttpClient;
-import eu.arrowhead.demo.utils.ProcessTemplate;
-import java.io.IOException;
+import eu.arrowhead.demo.utils.ProcessInputHandler;
 import java.util.Objects;
-import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.PreDestroy;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -29,10 +28,10 @@ import org.springframework.web.util.UriComponents;
 @Service
 public class ChargingStationService {
 
+    private final static String CARD_UID = "Card read UID: ";
     private final Logger logger = LogManager.getLogger();
     private final ExecutorService executorService;
     private final ControllableLed red;
-    private final ProcessTemplate rfidTemplate;
     private final PowerHandler powerHandler;
     private final ArrowheadHandler arrowhead;
     private final HttpClient httpClient;
@@ -40,37 +39,32 @@ public class ChargingStationService {
     private final Set<String> cache = new ConcurrentSkipListSet<String>();
     private final AtomicBoolean charging = new AtomicBoolean(false);
 
-    private Process rfidProcess = null;
+    private ProcessInputHandler rfidHandler = null;
 
     public ChargingStationService(final ExecutorService executorService,
-                                  @Qualifier("redControl") final ControllableLed red,
-                                  @Qualifier("rfid") final ProcessTemplate rfidTemplate,
-                                  final PowerHandler powerHandler, ArrowheadHandler arrowhead, HttpClient httpClient) {
+                                  @Qualifier("redControl") final ControllableLed red, final PowerHandler powerHandler,
+                                  final ArrowheadHandler arrowhead, final HttpClient httpClient) {
         this.executorService = executorService;
         this.red = red;
-        this.rfidTemplate = rfidTemplate;
         this.powerHandler = powerHandler;
         this.arrowhead = arrowhead;
         this.httpClient = httpClient;
 
         // watch all the time
-        rfidTemplate.setInputStreamConsumer(this::processRfid);
+        logger.info("New instance of {}", getClass().getSimpleName());
     }
 
     public void processRfid(final String string) {
         try {
-            logger.debug("New output from RFID reader: {}", string);
-            Scanner scanner = new Scanner(string);
-            scanner.findInLine("Card read UID: ");
-            if (scanner.hasNext()) {
-                charge(scanner.next());
+            if (StringUtils.startsWith(string, CARD_UID)) {
+                charge(StringUtils.remove(string, CARD_UID));
             }
-        } catch (final IOException | InterruptedException e) {
+        } catch (final Exception e) {
             logger.warn("Unable to execute charge request: {}", e.getMessage());
         }
     }
 
-    public boolean charge(final String rfid) throws IOException, InterruptedException {
+    public boolean charge(final String rfid) {
 
         if (Objects.isNull(rfid)) {
             return false;
@@ -86,8 +80,7 @@ public class ChargingStationService {
             red.blink();
 
             logger.info("Finding and contacting car with RFID {}", rfid);
-            final ServiceQueryFormDTO queryForm = new Builder(Constants.SERVICE_CAR_RFID).metadata("rfid", rfid)
-                                                                                         .build();
+            final ServiceQueryFormDTO queryForm = new Builder(Constants.SERVICE_CAR_RFID).metadata("rfid", rfid).build();
             final UriComponents carUri = arrowhead.createUri(queryForm);
             final ResponseEntity<RfidResponseDTO> rfidEntity = httpClient
                 .sendRequest(carUri, HttpMethod.GET, RfidResponseDTO.class);
@@ -101,6 +94,9 @@ public class ChargingStationService {
                 logger.info("Unknown RFID: {}", rfid);
                 return false;
             }
+        } catch (final Exception e) {
+            charging.set(false);
+            throw e;
         } finally {
             red.turnOff();
         }
@@ -112,24 +108,28 @@ public class ChargingStationService {
     }
 
     @EventListener(OnboardingFinishedEvent.class)
-    public void initProcesses() throws IOException {
-        rfidProcess = rfidTemplate.executeWithGobblers();
+    public void initProcesses() {
+        logger.info("Starting RFID process");
+        if (Objects.nonNull(rfidHandler)) {
+            rfidHandler.stop();
+        }
     }
 
     @PreDestroy
-    public void stopProcesses() throws IOException {
-        if (Objects.nonNull(rfidProcess)) {
-            rfidProcess.destroyForcibly();
+    public void stopProcesses() {
+        logger.info("Stopping RFID process");
+        if (Objects.nonNull(rfidHandler)) {
+            rfidHandler.stop();
         }
     }
 
     public boolean register(final String rfid) {
-        // TODO contact arrowhead?
+        logger.info("Register RFID in cache: {}", rfid);
         return cache.add(rfid);
     }
 
     public boolean unregister(final String rfid) {
-        // TODO contact arrowhead?
+        logger.info("Removing RFID from cache: {}", rfid);
         return cache.remove(rfid);
     }
 
@@ -144,6 +144,7 @@ public class ChargingStationService {
         @Override
         public void run() {
             try {
+                logger.info("Starting charge for {}", rfid);
                 charging.set(true);
                 red.turnOn();
                 powerHandler.turnOn();

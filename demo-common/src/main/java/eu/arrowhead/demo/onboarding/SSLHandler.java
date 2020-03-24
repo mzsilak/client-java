@@ -6,21 +6,24 @@ import eu.arrowhead.common.dto.shared.CertificateResponseDTO;
 import eu.arrowhead.demo.ssl.TrustAllX509TrustManager;
 import eu.arrowhead.demo.utils.SSLUtilities;
 import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.UnrecoverableKeyException;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.Objects;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -29,6 +32,7 @@ import javax.net.ssl.TrustManagerFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -68,6 +72,7 @@ public class SSLHandler {
         if (location.exists()) {
             loadStore(store, location, type, password);
         } else {
+            Files.createFile(Path.of(location.getFilename()));
             saveStore(store, location, password);
         }
 
@@ -91,8 +96,9 @@ public class SSLHandler {
         Assert.notNull(type, "Store type must not be null");
         Assert.notNull(password, "Store password must not be null");
 
-        logger.debug("Loading store from resource: {}", location);
-        try (final InputStream stream = location.getInputStream()) {
+        final String absolutePath = location.getFile().getAbsolutePath();
+        logger.debug("Loading store from resource: {}", absolutePath);
+        try (final FileInputStream stream = new FileInputStream(absolutePath)) {
             store.load(stream, password.toCharArray());
         }
     }
@@ -104,8 +110,9 @@ public class SSLHandler {
         Assert.notNull(location.getFilename(), "Store location must not be null");
         Assert.notNull(password, "Store password must not be null");
 
-        logger.debug("Saving store to resource: {}", location);
-        try (final FileOutputStream stream = new FileOutputStream(location.getFilename())) {
+        final String absolutePath = location.getFile().getAbsolutePath();
+        logger.debug("Saving store to resource: {}", absolutePath);
+        try (final FileOutputStream stream = new FileOutputStream(absolutePath)) {
             store.store(stream, password.toCharArray());
         }
     }
@@ -114,35 +121,44 @@ public class SSLHandler {
         return sslProperties.isSslEnabled();
     }
 
-    public void adaptSSLContext(final String name, final String certificateType, final CertificateResponseDTO response,
+    public void adaptSSLContext(final String commonName, final String certificateType,
+                                final CertificateResponseDTO response,
                                 final String cloudCert, final String rootCert)
         throws CertificateException, IOException, InvalidKeySpecException, NoSuchAlgorithmException, KeyStoreException {
         logger.info("Adapting SSLContext ...");
-
+        return; /*
         logger.debug("Decoding private key ...");
         final PrivateKey privateKey = SSLUtilities
             .parsePrivateKey(response.getPrivateKey(), response.getKeyAlgorithm());
 
         logger.debug("Decoding certificates ...");
-        final Certificate[] chain = new Certificate[3];
-        chain[2] = parseCertificate(response.getCertificate(), certificateType);
+        final X509Certificate[] chain = new X509Certificate[3];
+        chain[0] = parseCertificate(response.getCertificate(), certificateType);
         chain[1] = parseCertificate(cloudCert, certificateType);
-        chain[0] = parseCertificate(rootCert, certificateType);
+        chain[2] = parseCertificate(rootCert, certificateType);
 
-        storeKeyEntry(name, privateKey, chain);
-        storeCertificateEntry("arrowhead-intermediate-certificate", chain[1]);
-        storeCertificateEntry("arrowhead-root-certificate", chain[2]);
+        //final String alias = Utilities.getCertCNFromSubject(chain[0].getSubjectDN().getName());
+
+        storeKeyEntry(commonName, privateKey, chain);
+        storeCertificateEntry(chain[1]);
+        storeCertificateEntry(chain[2]);
+
+        loadStore(keyStore, sslProperties.getKeyStore(), sslProperties.getKeyStoreType(),
+                  sslProperties.getKeyStorePassword());
+
+        loadStore(trustStore, sslProperties.getTrustStore(), sslProperties.getKeyStoreType(),
+                  sslProperties.getTrustStorePassword()); */
     }
 
-    private Certificate parseCertificate(final String certificateString, final String format)
+    private X509Certificate parseCertificate(final String certificateString, final String format)
         throws CertificateException, IOException {
         final CertificateFactory certificateFactory = CertificateFactory.getInstance(format);
         final byte[] certificateBytes = Base64Utils.decodeFromString(certificateString);
 
-        final Certificate certificate;
+        final X509Certificate certificate;
 
         try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(certificateBytes)) {
-            certificate = certificateFactory.generateCertificate(byteArrayInputStream);
+            certificate = (X509Certificate) certificateFactory.generateCertificate(byteArrayInputStream);
         } catch (final CertificateException | IOException e) {
             logger.error("Unable to generate certificate from Base64: {}", certificateString);
             throw e;
@@ -151,23 +167,24 @@ public class SSLHandler {
         return certificate;
     }
 
-    private void storeKeyEntry(final String alias, final PrivateKey privateKey, final Certificate[] chain)
+    private void storeKeyEntry(final String alias, final PrivateKey privateKey, final X509Certificate[] chain)
         throws NoSuchAlgorithmException, CertificateException, KeyStoreException, IOException {
-        logger.debug("Saving PrivateKey and certificate chain in keyStore as '{}'", alias);
+
+        final Object[] principals = Arrays.stream(chain)
+                                          .map((c) -> Utilities.getCertCNFromSubject(c.getSubjectDN().getName()))
+                                          .toArray();
+
+        logger.debug("Saving PrivateKey and certificate chain ({}) in keyStore as '{}'", principals, alias);
         keyStore.setKeyEntry(alias, privateKey, sslProperties.getKeyPassword().toCharArray(), chain);
         saveStore(keyStore, sslProperties.getKeyStore(), sslProperties.getKeyStorePassword());
     }
 
-    private void storeCertificateEntry(String alias, Certificate certificate)
+    private void storeCertificateEntry(final X509Certificate certificate)
         throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException {
-        if (certificate instanceof X509Certificate) {
-            logger.debug("Saving trusted certificate '{}' as '{}'",
-                         ((X509Certificate) certificate).getSubjectX500Principal(), alias);
-        } else {
-            logger.debug("Saving trusted certificate (type {}) as '{}'", certificate.getType(), alias);
-        }
+        final String alias = Utilities.getCertCNFromSubject(certificate.getSubjectDN().getName());
+        logger.debug("Saving trusted certificate '{}' as '{}'", certificate.getSubjectX500Principal(), alias);
 
-        keyStore.setCertificateEntry(alias, certificate);
+        // keyStore.setCertificateEntry(alias, certificate);
         trustStore.setCertificateEntry(alias, certificate);
 
         saveStore(keyStore, sslProperties.getKeyStore(), sslProperties.getKeyStorePassword());
@@ -177,6 +194,7 @@ public class SSLHandler {
     public SSLContext createSSLContext()
         throws NoSuchAlgorithmException, UnrecoverableKeyException, KeyStoreException, KeyManagementException {
         final SSLContext sslContext = SSLContext.getInstance("TLS");
+        logger.info("Using real SSLContext");
         sslContext.init(createKeyManagers(), createTrustManagers(), null);
         return sslContext;
     }
@@ -198,13 +216,25 @@ public class SSLHandler {
 
     public SSLContext createInsecureSSLContext()
         throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+        logger.info("Using trust all SSLContext");
+
         final SSLContext sslContext = SSLContext.getInstance("TLS");
         sslContext.init(createKeyManagers(), createTrustAllTrustManagers(), null);
         return sslContext;
+
+        /*
+        return new SSLContextBuilder().loadTrustMaterial(trustStore, new TrustAllStrategy())
+                                      .loadKeyMaterial(keyStore, sslProperties.getKeyPassword().toCharArray())
+                                      .setKeyStoreType(sslProperties.getKeyStoreType()).build();
+         */
     }
 
-    private TrustManager[] createTrustAllTrustManagers() {
-        return new TrustManager[]{new TrustAllX509TrustManager()};
+    private TrustManager[] createTrustAllTrustManagers() throws KeyStoreException, NoSuchAlgorithmException {
+        final TrustManager[] existing = createTrustManagers();
+        final TrustManager[] newManagers = new TrustManager[existing.length + 1];
+        System.arraycopy(existing, 0, newManagers, 1, existing.length);
+        newManagers[0] = new TrustAllX509TrustManager();
+        return newManagers;
     }
 
     public SSLProperties getSslProperties() {
@@ -214,5 +244,16 @@ public class SSLHandler {
     public String getEncodedPublicKey() {
         X509Certificate serverCert = Utilities.getFirstCertFromKeyStore(keyStore);
         return Base64.getEncoder().encodeToString(serverCert.getPublicKey().getEncoded());
+    }
+
+    public boolean hasCertificates() {
+        if (Objects.nonNull(keyStore)) {
+            try {
+                return keyStore.aliases().hasMoreElements();
+            } catch (KeyStoreException e) {
+                // noop
+            }
+        }
+        return false;
     }
 }

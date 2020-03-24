@@ -1,9 +1,9 @@
 package eu.arrowhead.client.station;
 
-import static eu.arrowhead.demo.dto.Constants.STATION_CONTROLLER_PATH;
 import static eu.arrowhead.demo.dto.Constants.OP_STATION_CHARGE_URI;
 import static eu.arrowhead.demo.dto.Constants.OP_STATION_REGISTER_URI;
 import static eu.arrowhead.demo.dto.Constants.OP_STATION_UNREGISTER_URI;
+import static eu.arrowhead.demo.dto.Constants.STATION_CONTROLLER_PATH;
 
 import eu.arrowhead.common.CommonConstants;
 import eu.arrowhead.common.Utilities;
@@ -19,6 +19,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -45,7 +46,7 @@ public class ChargingStationController {
     @POST
     @Path(OP_STATION_CHARGE_URI)
     public ChargeResponseDTO charge(final ChargeRequestDTO request) {
-        logger.info("register");
+        logger.info("charge");
         Assert.notNull(request, "Request body empty");
         Assert.hasText(request.getRfid(), "RFID must be provided");
         boolean success;
@@ -56,6 +57,20 @@ public class ChargingStationController {
             success = false;
         }
         return new ChargeResponseDTO(success);
+    }
+
+    @GET
+    @Path(OP_STATION_CHARGE_URI + "/{rfid}")
+    public void charge(@PathParam("rfid") final String rfid) {
+        logger.info("charge");
+        Assert.hasText(rfid, "RFID must be provided");
+        boolean success;
+        try {
+            success = chargingService.charge(rfid);
+        } catch (Exception e) {
+            logger.warn("Charging failed with: {}", e.getMessage());
+            success = false;
+        }
     }
 
     @POST

@@ -3,55 +3,43 @@ package eu.arrowhead.demo.utils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Path;
 import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
-import org.apache.commons.lang3.SystemUtils;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.util.Assert;
 
 public class ProcessTemplate {
 
     private final static Executor DEFAULT_EXECUTOR = Executors.newCachedThreadPool();
+    private final Logger logger = LogManager.getLogger();
     private final ProcessBuilder builder;
 
-    private Path directory;
-    private Executor executor;
-    private Consumer<String> in;
-    private Consumer<String> err;
-
-    private Class<Object> gobbler;
+    private Executor executor = DEFAULT_EXECUTOR;
+    private Consumer<String> inputStreamConsumer;
+    private boolean manualInStream = false;
 
     public ProcessTemplate(final String... args) {
         Assert.notEmpty(args, "Template must have a command");
-        final String[] command = new String[args.length + 2];
-        if (SystemUtils.IS_OS_LINUX) {
-            command[0] = "sh";
-            command[1] = "-c";
-        } else if (SystemUtils.IS_OS_WINDOWS) {
-            command[0] = "cmd.exe";
-            command[1] = "/c";
-        }
-        System.arraycopy(args, 0, command, 2, args.length);
-        builder = new ProcessBuilder(command);
-        executor = DEFAULT_EXECUTOR;
+        builder = new ProcessBuilder(args);
+        builder.redirectErrorStream(true);
     }
 
     public Process execute() throws IOException {
-        return builder.start();
-    }
-
-    public Process executeWithGobblers() throws IOException {
+        logger.debug("Starting new process: {}", builder.command());
         final Process process = builder.start();
-        alterStream(process.getInputStream(), in);
-        alterStream(process.getErrorStream(), err);
+        if (!manualInStream) {
+            alterStream(process.getInputStream(), inputStreamConsumer);
+        }
         return process;
     }
 
     private void alterStream(final InputStream inputStream, final Consumer<String> consumer) {
         if (Objects.isNull(consumer)) {
-            executor.execute(new NullStreamGobbler(inputStream));
+            executor.execute(new LoggingStreamGobbler(inputStream, Level.DEBUG, "IGNORED: "));
         } else {
             executor.execute(new StreamGobbler(inputStream, consumer));
         }
@@ -70,11 +58,11 @@ public class ProcessTemplate {
         this.executor = executor;
     }
 
-    public void setInputStreamConsumer(final Consumer<String> in) {
-        this.in = in;
+    public void setInputStreamConsumer(final Consumer<String> inputStreamConsumer) {
+        this.inputStreamConsumer = inputStreamConsumer;
     }
 
-    public void setErrStreamConsumer(final Consumer<String> err) {
-        this.err = err;
+    public void manualInputStream(boolean manualInStream) {
+        this.manualInStream = manualInStream;
     }
 }

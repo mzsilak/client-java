@@ -3,8 +3,8 @@ package eu.arrowhead.common;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import eu.arrowhead.common.dto.shared.RelayType;
 import eu.arrowhead.common.dto.shared.ErrorMessageDTO;
+import eu.arrowhead.common.dto.shared.RelayType;
 import eu.arrowhead.common.exception.ArrowheadException;
 import eu.arrowhead.common.exception.AuthException;
 import eu.arrowhead.common.exception.BadPayloadException;
@@ -12,20 +12,6 @@ import eu.arrowhead.common.exception.DataNotFoundException;
 import eu.arrowhead.common.exception.InvalidParameterException;
 import eu.arrowhead.common.exception.TimeoutException;
 import eu.arrowhead.common.exception.UnavailableServerException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.springframework.http.HttpStatus;
-import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.util.StringUtils;
-import org.springframework.web.util.UriComponents;
-import org.springframework.web.util.UriComponentsBuilder;
-
-import javax.naming.InvalidNameException;
-import javax.naming.ldap.LdapName;
-import javax.naming.ldap.Rdn;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,6 +25,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.UnrecoverableKeyException;
+import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
@@ -60,6 +47,19 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.ServiceConfigurationError;
 import java.util.regex.Pattern;
+import javax.naming.InvalidNameException;
+import javax.naming.ldap.LdapName;
+import javax.naming.ldap.Rdn;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.http.HttpStatus;
+import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.util.StringUtils;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 
 public class Utilities {
 
@@ -90,7 +90,8 @@ public class Utilities {
             keyFactory = KeyFactory.getInstance(KEY_FACTORY_ALGORHITM_NAME);
         } catch (final NoSuchAlgorithmException ex) {
             logger.fatal("KeyFactory.getInstance(String) throws NoSuchAlgorithmException, code needs to be changed!");
-            throw new ServiceConfigurationError("KeyFactory.getInstance(String) throws NoSuchAlgorithmException, code needs to be changed!", ex);
+            throw new ServiceConfigurationError(
+                "KeyFactory.getInstance(String) throws NoSuchAlgorithmException, code needs to be changed!", ex);
         }
     }
 
@@ -98,13 +99,8 @@ public class Utilities {
     // methods
 
     //-------------------------------------------------------------------------------------------------
-    public static boolean isEmpty(final String str) {
-        return str == null || str.isBlank();
-    }
-
-    //-------------------------------------------------------------------------------------------------
-    public static boolean notEmpty(final String str) {
-        return StringUtils.hasText(str);
+    private Utilities() {
+        throw new UnsupportedOperationException();
     }
 
     //-------------------------------------------------------------------------------------------------
@@ -135,17 +131,18 @@ public class Utilities {
         }
 
         final TemporalAccessor tempAcc = dateTimeFormatter.parse(timeStr);
-        final ZonedDateTime parsedDateTime = ZonedDateTime.of(tempAcc.get(ChronoField.YEAR),
-                tempAcc.get(ChronoField.MONTH_OF_YEAR),
-                tempAcc.get(ChronoField.DAY_OF_MONTH),
-                tempAcc.get(ChronoField.HOUR_OF_DAY),
-                tempAcc.get(ChronoField.MINUTE_OF_HOUR),
-                tempAcc.get(ChronoField.SECOND_OF_MINUTE),
-                0,
-                ZoneOffset.UTC);
+        final ZonedDateTime parsedDateTime = ZonedDateTime
+            .of(tempAcc.get(ChronoField.YEAR), tempAcc.get(ChronoField.MONTH_OF_YEAR),
+                tempAcc.get(ChronoField.DAY_OF_MONTH), tempAcc.get(ChronoField.HOUR_OF_DAY),
+                tempAcc.get(ChronoField.MINUTE_OF_HOUR), tempAcc.get(ChronoField.SECOND_OF_MINUTE), 0, ZoneOffset.UTC);
 
         final ZoneOffset offset = OffsetDateTime.now().getOffset();
         return ZonedDateTime.ofInstant(parsedDateTime.toInstant(), offset);
+    }
+
+    //-------------------------------------------------------------------------------------------------
+    public static boolean isEmpty(final String str) {
+        return str == null || str.isBlank();
     }
 
     //-------------------------------------------------------------------------------------------------
@@ -193,7 +190,8 @@ public class Utilities {
         try {
             return mapper.readValue(json, parsedClass);
         } catch (final IOException ex) {
-            throw new ArrowheadException("The specified string cannot be converted to a(n) " + parsedClass.getSimpleName() + " object.", ex);
+            throw new ArrowheadException(
+                "The specified string cannot be converted to a(n) " + parsedClass.getSimpleName() + " object.", ex);
         }
     }
 
@@ -209,7 +207,8 @@ public class Utilities {
             final String[] parts = text.split(",");
             for (final String part : parts) {
                 final String[] pair = part.split("=");
-                result.put(URLDecoder.decode(pair[0].trim(), StandardCharsets.UTF_8), pair.length == 1 ? "" : URLDecoder.decode(pair[1].trim(), StandardCharsets.UTF_8));
+                result.put(URLDecoder.decode(pair[0].trim(), StandardCharsets.UTF_8),
+                           pair.length == 1 ? "" : URLDecoder.decode(pair[1].trim(), StandardCharsets.UTF_8));
             }
         }
 
@@ -235,19 +234,26 @@ public class Utilities {
 
     //-------------------------------------------------------------------------------------------------
 
+    //-------------------------------------------------------------------------------------------------
+    public static UriComponents createURI(final String scheme, final String host, final int port, final String path) {
+        return createURI(scheme, host, port, null, path, (String[]) null);
+    }
+
     /**
-     * @param scheme       default: http
-     * @param host         default: 127.0.0.1
-     * @param port         default: 80
-     * @param queryParams  default: null
-     * @param path         default: null
+     * @param scheme default: http
+     * @param host default: 127.0.0.1
+     * @param port default: 80
+     * @param queryParams default: null
+     * @param path default: null
      * @param pathSegments default: null
      */
-    public static UriComponents createURI(final String scheme, final String host, final int port, final MultiValueMap<String, String> queryParams, final String path, final String... pathSegments) {
+    public static UriComponents createURI(final String scheme, final String host, final int port,
+                                          final MultiValueMap<String, String> queryParams, final String path,
+                                          final String... pathSegments) {
         final UriComponentsBuilder builder = UriComponentsBuilder.newInstance();
         builder.scheme(scheme == null ? CommonConstants.HTTP : scheme)
-                .host(host == null ? CommonConstants.LOCALHOST : host)
-                .port(port <= 0 ? CommonConstants.HTTP_PORT : port);
+               .host(host == null ? CommonConstants.LOCALHOST : host)
+               .port(port <= 0 ? CommonConstants.HTTP_PORT : port);
 
         if (queryParams != null) {
             builder.queryParams(queryParams);
@@ -265,12 +271,8 @@ public class Utilities {
     }
 
     //-------------------------------------------------------------------------------------------------
-    public static UriComponents createURI(final String scheme, final String host, final int port, final String path) {
-        return createURI(scheme, host, port, null, path, (String[]) null);
-    }
-
-    //-------------------------------------------------------------------------------------------------
-    public static UriComponents createURI(final String scheme, final String host, final int port, final String path, final String... queryParams) {
+    public static UriComponents createURI(final String scheme, final String host, final int port, final String path,
+                                          final String... queryParams) {
         if (queryParams.length % 2 != 0) {
             throw new InvalidParameterException("queryParams variable arguments conatins a key without value");
         }
@@ -337,9 +339,7 @@ public class Utilities {
     //-------------------------------------------------------------------------------------------------
     @Nullable
     public static String getCertCNFromSubject(final String subjectName) {
-        if (subjectName == null) {
-            return null;
-        }
+        Assert.notNull(subjectName, "SubjectName must not be null");
 
         try {
             // Subject is in LDAP format, we can use the LdapName object for parsing
@@ -355,7 +355,8 @@ public class Utilities {
             logger.debug("Exception", ex);
         }
 
-        return null;
+        throw new IllegalArgumentException(
+            "Given SubjectName '" + subjectName + "' is not a valid subject (missing " + "CN field)");
     }
 
     //-------------------------------------------------------------------------------------------------
@@ -371,61 +372,78 @@ public class Utilities {
         Assert.notNull(keystore, "Key store is not defined.");
 
         try {
+            /*
+            // the first certificate is not always the client certificate. java does not guarantee the order
             final Enumeration<String> enumeration = keystore.aliases();
-            final String alias = enumeration.nextElement();
-            return (X509Certificate) keystore.getCertificate(alias);
+            while (enumeration.hasMoreElements()) {
+                final Certificate[] chain = keystore.getCertificateChain(enumeration.nextElement());
+
+                if (Objects.nonNull(chain) && chain.length >= 3) {
+                    return (X509Certificate) chain[0];
+                }
+            }
+            throw new ServiceConfigurationError("Getting the first cert from keystore failed...");
+             */
+            final Enumeration<String> enumeration = keystore.aliases();
+            return (X509Certificate) keystore.getCertificate(enumeration.nextElement());
         } catch (final KeyStoreException | NoSuchElementException ex) {
             logger.error("Getting the first cert from key store failed...", ex);
             throw new ServiceConfigurationError("Getting the first cert from keystore failed...", ex);
         }
     }
-//-------------------------------------------------------------------------------------------------
-	public static X509Certificate getCloudCertFromKeyStore(final KeyStore keystore) {
-		Assert.notNull(keystore, "Key store is not defined.");
 
-		try {
-			final Enumeration<String> enumeration = keystore.aliases();
-			while (enumeration.hasMoreElements()) {
-				final String alias = enumeration.nextElement();
-				final String[] aliasParts = alias.split("\\.");
-				if (aliasParts.length == 4 && aliasParts[2].equals(AH_MASTER_NAME) && aliasParts[3].equals(AH_MASTER_SUFFIX)) {
-					return (X509Certificate) keystore.getCertificate(alias);
-				}
-			}
+    //-------------------------------------------------------------------------------------------------
+    public static X509Certificate getCloudCertFromKeyStore(final KeyStore keystore) {
+        Assert.notNull(keystore, "Key store is not defined.");
 
-			final String errorMsg = "Getting the cloud cert from keystore failed. " +
-					"Cannot find alias in the following format: {cloudname}.{cloudoperator}." + AH_MASTER_NAME + "." + AH_MASTER_SUFFIX;
-			logger.error(errorMsg);
-			throw new ServiceConfigurationError(errorMsg);
-		} catch (final KeyStoreException | NoSuchElementException ex) {
-			logger.error("Getting the cloud cert from keystore failed...", ex);
-			throw new ServiceConfigurationError("Getting the cloud cert from keystore failed...", ex);
-		}
-	}
+        try {
+            final Enumeration<String> enumeration = keystore.aliases();
+            while (enumeration.hasMoreElements()) {
+                final String alias = enumeration.nextElement();
+                final String[] aliasParts = alias.split("\\.");
+                if (aliasParts.length == 4 && aliasParts[2].equals(AH_MASTER_NAME) && aliasParts[3]
+                    .equals(AH_MASTER_SUFFIX)) {
+                    return (X509Certificate) keystore.getCertificate(alias);
+                }
+            }
 
-	//-------------------------------------------------------------------------------------------------
-	public static X509Certificate getRootCertFromKeyStore(final KeyStore keystore) {
-		Assert.notNull(keystore, "Key store is not defined.");
+            final String errorMsg = "Getting the cloud cert from keystore failed. "
+                + "Cannot find alias in the following format: {cloudname}.{cloudoperator}." + AH_MASTER_NAME + "."
+                + AH_MASTER_SUFFIX;
+            logger.error(errorMsg);
+            throw new ServiceConfigurationError(errorMsg);
+        } catch (final KeyStoreException | NoSuchElementException ex) {
+            logger.error("Getting the cloud cert from keystore failed...", ex);
+            throw new ServiceConfigurationError("Getting the cloud cert from keystore failed...", ex);
+        }
+    }
 
-		try {
-			final Enumeration<String> enumeration = keystore.aliases();
-			while (enumeration.hasMoreElements()) {
-				final String alias = enumeration.nextElement();
-				final String[] aliasParts = alias.split("\\.");
-				if (aliasParts.length == 2 && aliasParts[0].equals(AH_MASTER_NAME) && aliasParts[1].equals(AH_MASTER_SUFFIX)) {
-					return (X509Certificate) keystore.getCertificate(alias);
-				}
-			}
+    //-------------------------------------------------------------------------------------------------
+    public static X509Certificate getRootCertFromKeyStore(final KeyStore keystore) {
+        Assert.notNull(keystore, "Key store is not defined.");
 
-			final String errorMsg = "Getting the root cert from keystore failed. " +
-					"Cannot find alias in the following format: " + AH_MASTER_NAME + "." + AH_MASTER_SUFFIX;
-			logger.error(errorMsg);
-			throw new ServiceConfigurationError(errorMsg);
-		} catch (final KeyStoreException | NoSuchElementException ex) {
-			logger.error("Getting the root cert from keystore failed...", ex);
-			throw new ServiceConfigurationError("Getting the root cert from keystore failed...", ex);
-		}
-	}
+        try {
+            final Enumeration<String> enumeration = keystore.aliases();
+            while (enumeration.hasMoreElements()) {
+                final String alias = enumeration.nextElement();
+                final String[] aliasParts = alias.split("\\.");
+                if (aliasParts.length == 2 && aliasParts[0].equals(AH_MASTER_NAME) && aliasParts[1]
+                    .equals(AH_MASTER_SUFFIX)) {
+                    return (X509Certificate) keystore.getCertificate(alias);
+                }
+            }
+
+            final String errorMsg =
+                "Getting the root cert from keystore failed. " + "Cannot find alias in the following format: "
+                    + AH_MASTER_NAME + "." + AH_MASTER_SUFFIX;
+            logger.error(errorMsg);
+            throw new ServiceConfigurationError(errorMsg);
+        } catch (final KeyStoreException | NoSuchElementException ex) {
+            logger.error("Getting the root cert from keystore failed...", ex);
+            throw new ServiceConfigurationError("Getting the root cert from keystore failed...", ex);
+        }
+    }
+
     //-------------------------------------------------------------------------------------------------
     public static PrivateKey getPrivateKey(final KeyStore keystore, final String keyPass) {
         Assert.notNull(keystore, "Key store is not defined.");
@@ -448,7 +466,8 @@ public class Utilities {
         }
 
         if (privateKey == null) {
-            throw new ServiceConfigurationError("Getting the private key failed, key store aliases do not identify a key.");
+            throw new ServiceConfigurationError(
+                "Getting the private key failed, key store aliases do not identify a key.");
         }
 
         return privateKey;
@@ -456,28 +475,39 @@ public class Utilities {
 
     //-------------------------------------------------------------------------------------------------
     public static PrivateKey getPrivateKey(final KeyStore keystore, final String alias, final String keyPass) {
-		Assert.notNull(keystore, "Key store is not defined.");
-		Assert.notNull(keyPass, "Password is not defined.");
+        Assert.notNull(keystore, "Key store is not defined.");
+        Assert.notNull(keyPass, "Password is not defined.");
 
-		try {
-			PrivateKey privateKey = (PrivateKey) keystore.getKey(alias, keyPass.toCharArray());
-			if (privateKey != null) {
-				return privateKey;
-			} else {
-				throw new ServiceConfigurationError("Getting the private key failed, key store aliases do not identify a key.");
-			}
-		} catch (final KeyStoreException | UnrecoverableKeyException | NoSuchAlgorithmException ex) {
-			logger.error("Getting the private key from key store failed...", ex);
-			throw new ServiceConfigurationError("Getting the private key from key store failed...", ex);
-		}
-	}
+        try {
+            PrivateKey privateKey = (PrivateKey) keystore.getKey(alias, keyPass.toCharArray());
+            if (privateKey != null) {
+                return privateKey;
+            } else {
+                throw new ServiceConfigurationError(
+                    "Getting the private key failed, key store aliases do not identify a key.");
+            }
+        } catch (final KeyStoreException | UnrecoverableKeyException | NoSuchAlgorithmException ex) {
+            logger.error("Getting the private key from key store failed...", ex);
+            throw new ServiceConfigurationError("Getting the private key from key store failed...", ex);
+        }
+    }
 
-	//-------------------------------------------------------------------------------------------------
-	public static PublicKey getPublicKeyFromBase64EncodedString(final String encodedKey) {
+    //-------------------------------------------------------------------------------------------------
+    public static PublicKey getPublicKeyFromBase64EncodedString(final String encodedKey) {
         Assert.isTrue(!isEmpty(encodedKey), "Encoded key is null or blank");
 
         final byte[] keyBytes = Base64.getDecoder().decode(encodedKey);
         return generatePublicKeyFromByteArray(keyBytes);
+    }
+
+    //-------------------------------------------------------------------------------------------------
+    private static PublicKey generatePublicKeyFromByteArray(final byte[] keyBytes) {
+        try {
+            return keyFactory.generatePublic(new X509EncodedKeySpec(keyBytes));
+        } catch (final InvalidKeySpecException ex) {
+            logger.error("getPublicKey: X509 keyspec could not be created from the decoded bytes.");
+            throw new AuthException("Public key decoding failed due wrong input key", ex);
+        }
     }
 
     //-------------------------------------------------------------------------------------------------
@@ -508,7 +538,8 @@ public class Utilities {
         }
 
         final String[] cnFields = commonName.split("\\.", 0);
-        return cnFields.length == SERVICE_CN_NAME_LENGTH && cnFields[cnFields.length - 1].equals(AH_MASTER_SUFFIX) && cnFields[cnFields.length - 2].equals(AH_MASTER_NAME);
+        return cnFields.length == SERVICE_CN_NAME_LENGTH && cnFields[cnFields.length - 1].equals(AH_MASTER_SUFFIX)
+            && cnFields[cnFields.length - 2].equals(AH_MASTER_NAME);
     }
 
     //-------------------------------------------------------------------------------------------------
@@ -517,7 +548,8 @@ public class Utilities {
             return false;
         }
 
-        final String[] clientFields = clientCN.split("\\.", 2); // valid clientFields contains clientServiceName, cloudName.operator.arrowhead.eu
+        final String[] clientFields = clientCN
+            .split("\\.", 2); // valid clientFields contains clientServiceName, cloudName.operator.arrowhead.eu
 
         return clientFields.length >= 2 && cloudCN.equalsIgnoreCase(clientFields[1]);
     }
@@ -565,17 +597,25 @@ public class Utilities {
     }
 
     //-------------------------------------------------------------------------------------------------
-    public static String firstNotNullIfExists(final String first, final String second) {
-        return Utilities.notEmpty(first) ? first : second;
-    }
-
-    //-------------------------------------------------------------------------------------------------
     @SuppressWarnings("unchecked")
     public static <T> T firstNotNullIfExists(final T first, final T second) {
         if (first instanceof String && second instanceof String) {
             return (T) firstNotNullIfExists((String) first, (String) second);
         }
         return Objects.nonNull(first) ? first : second;
+    }
+
+    //-------------------------------------------------------------------------------------------------
+    public static String firstNotNullIfExists(final String first, final String second) {
+        return Utilities.notEmpty(first) ? first : second;
+    }
+
+    //=================================================================================================
+    // assistant methods
+
+    //-------------------------------------------------------------------------------------------------
+    public static boolean notEmpty(final String str) {
+        return StringUtils.hasText(str);
     }
 
     //-------------------------------------------------------------------------------------------------
@@ -587,23 +627,5 @@ public class Utilities {
         }
 
         return null;
-    }
-
-    //=================================================================================================
-    // assistant methods
-
-    //-------------------------------------------------------------------------------------------------
-    private Utilities() {
-        throw new UnsupportedOperationException();
-    }
-
-    //-------------------------------------------------------------------------------------------------
-    private static PublicKey generatePublicKeyFromByteArray(final byte[] keyBytes) {
-        try {
-            return keyFactory.generatePublic(new X509EncodedKeySpec(keyBytes));
-        } catch (final InvalidKeySpecException ex) {
-            logger.error("getPublicKey: X509 keyspec could not be created from the decoded bytes.");
-            throw new AuthException("Public key decoding failed due wrong input key", ex);
-        }
     }
 }

@@ -29,7 +29,7 @@ public class PowerHandler {
 
     public void turnOn() {
         try {
-            final Process process = powerOn.executeWithGobblers();
+            final Process process = powerOn.execute();
             process.waitFor();
         } catch (IOException | InterruptedException e) {
             logger.warn(e.getMessage());
@@ -38,7 +38,7 @@ public class PowerHandler {
 
     public void turnOff() {
         try {
-            final Process process = powerOff.executeWithGobblers();
+            final Process process = powerOff.execute();
             process.waitFor();
         } catch (IOException | InterruptedException e) {
             logger.warn(e.getMessage());
@@ -49,7 +49,6 @@ public class PowerHandler {
         try {
             final Process process = powerRead.execute();
             powerRead.startGobbler(new LoggingStreamGobbler(process.getInputStream(), Level.INFO, "POWER: "));
-            powerRead.startGobbler(new LoggingStreamGobbler(process.getErrorStream(), Level.ERROR, "POWER: "));
             process.waitFor();
         } catch (IOException | InterruptedException e) {
             logger.warn(e.getMessage());

@@ -32,6 +32,9 @@
     <module>demo-common</module>
     <module>eisenstadt-demo-car</module>
     <module>eisenstadt-demo-station</module>
+    <module>eisenstadt-demo-car-exec</module>
+    <module>eisenstadt-demo-station-exec</module>
+    <module>eisenstadt-demo-led</module>
   </modules>
 
   <properties>

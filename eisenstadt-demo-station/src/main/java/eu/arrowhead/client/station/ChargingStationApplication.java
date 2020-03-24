@@ -64,13 +64,14 @@ public class ChargingStationApplication {
         this.red = red;
 
         httpServer.configureName(commonName);
-        onboardingHandler.performOnboarding(new OnboardingWithNameRequestDTO(commonName));
+        onboardingHandler.onboard(new OnboardingWithNameRequestDTO(commonName));
         performOffboarding();
     }
 
     @PreDestroy
     public void performOffboarding() {
         try {
+            logger.info("Unregistering myself ...");
             httpServer.stop();
             green.blink();
             red.blink();
@@ -122,11 +123,13 @@ public class ChargingStationApplication {
             onboardingHandler.registerService(
                 getServiceRegistryRequest(ipAddress, port, validity, authInfo, Constants.OP_STATION_UNREGISTER_URI,
                                           Constants.SERVICE_STATION_UNREGISTER));
-            applicationEventPublisher.publishEvent(new OnboardingFinishedEvent(this));
-            red.turnOff();
         } catch (final Exception e) {
             logger.warn("Issues during onboarding: {}", e.getMessage());
         }
+
+        logger.info("Firing OnboardingFinishedEvent ...");
+        applicationEventPublisher.publishEvent(new OnboardingFinishedEvent(this));
+        red.turnOff();
     }
 
     private DeviceRegistryRequestDTO getDeviceRegistryRequest(String ipAddress, String macAddress, String validity,

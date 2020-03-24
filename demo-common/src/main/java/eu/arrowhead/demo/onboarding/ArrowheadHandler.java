@@ -60,7 +60,7 @@ public class ArrowheadHandler {
         this.onboardingHost = onboardingHost;
     }
 
-    public void performOnboarding(final OnboardingWithNameRequestDTO onboardingRequest)
+    public void onboard(final OnboardingWithNameRequestDTO onboardingRequest)
         throws NoSuchAlgorithmException, CertificateException, InvalidKeySpecException, KeyStoreException,
                IOException, SSLException {
 
@@ -191,11 +191,6 @@ public class ArrowheadHandler {
         return createUri(responseDto);
     }
 
-    public UriComponents createUri(final ServiceRegistryResponseDTO srResponseDto) {
-        return Utilities.createURI(httpClient.getScheme(), srResponseDto.getProvider().getAddress(),
-                                   srResponseDto.getProvider().getPort(), srResponseDto.getServiceUri());
-    }
-
     public ServiceQueryResultDTO lookupServiceRegistry(final ServiceQueryFormDTO srQueryForm) {
         final UriComponents srQueryUri = UriComponentsBuilder.fromUri(serviceRegistry.getUri()).replacePath(
             CommonConstants.SERVICE_REGISTRY_URI + CommonConstants.OP_SERVICE_REGISTRY_QUERY_URI).build();
@@ -209,6 +204,11 @@ public class ArrowheadHandler {
         }
 
         return srQueryResult;
+    }
+
+    public UriComponents createUri(final ServiceRegistryResponseDTO srResponseDto) {
+        return Utilities.createURI(httpClient.getScheme(), srResponseDto.getProvider().getAddress(),
+                                   srResponseDto.getProvider().getPort(), srResponseDto.getServiceUri());
     }
 
 }

@@ -21,8 +21,8 @@ import eu.arrowhead.demo.events.OffboardingFinishedEvent;
 import eu.arrowhead.demo.events.OnboardingFinishedEvent;
 import eu.arrowhead.demo.grovepi.ControllableLed;
 import eu.arrowhead.demo.grovepi.GroveButtonObserver;
-import eu.arrowhead.demo.onboarding.HttpClient;
 import eu.arrowhead.demo.onboarding.ArrowheadHandler;
+import eu.arrowhead.demo.onboarding.HttpClient;
 import eu.arrowhead.demo.ssl.SSLException;
 import eu.arrowhead.demo.utils.IpUtilities;
 import eu.arrowhead.demo.web.HttpServer;
@@ -86,11 +86,15 @@ public class ElectricCarApplication {
         httpServer.configureName(commonName);
         buttonObserver.setListener(this::toggleOnboarding);
 
-        onboardingHandler.performOnboarding(new OnboardingWithNameRequestDTO(commonName));
+        onboardingHandler.onboard(new OnboardingWithNameRequestDTO(commonName));
         performOffboarding();
+
+        buttonObserver.start();
+        logger.info("Listening to button");
     }
 
     public void toggleOnboarding() {
+        logger.info("Button trigger detected");
         if (onboarded.get()) {
             performOffboarding();
         } else {
@@ -105,6 +109,7 @@ public class ElectricCarApplication {
             green.blink();
             red.blink();
 
+            logger.info("Unregistering myself ...");
             final String ipAddress = IpUtilities.getIpAddress();
             final String macAddress = IpUtilities.getMacAddress();
             final int port = httpServer.getPort();
@@ -123,11 +128,11 @@ public class ElectricCarApplication {
             onboardingHandler.unregisterSystem(commonName, ipAddress, port);
             onboardingHandler.unregisterDevice(commonName, macAddress);
 
-            stopLeds();
         } catch (final Exception e) {
             logger.warn("Offboarding issue: {}", e.getMessage());
         } finally {
             onboarded.set(false);
+            stopStatusLeds();
         }
     }
 
@@ -135,6 +140,8 @@ public class ElectricCarApplication {
         try {
             green.blink();
             red.blink();
+
+            logger.info("Start onboarding ...");
 
             final String ipAddress = IpUtilities.getIpAddress();
             final String macAddress = IpUtilities.getMacAddress();
@@ -147,7 +154,7 @@ public class ElectricCarApplication {
                                                                                     authInfo);
             final SystemRegistryRequestDTO systemRequest = getSystemRegistryRequest(ipAddress, macAddress, port,
                                                                                     validity, rfid, authInfo);
-            final ServiceRegistryRequestDTO serviceRequest = getServiceRegistryRequest(ipAddress, port, validity,
+            final ServiceRegistryRequestDTO serviceRequest = getServiceRegistryRequest(ipAddress, port, validity, rfid,
                                                                                        authInfo,
                                                                                        Constants.OP_CAR_RFID_URI,
                                                                                        Constants.SERVICE_CAR_RFID);
@@ -167,10 +174,19 @@ public class ElectricCarApplication {
         }
     }
 
+    @EventListener(OnboardingFinishedEvent.class)
+    public void startWebServer() throws IOException {
+        httpServer.init();
+        httpServer.start();
+        green.turnOn();
+        logger.info("Status led turned on");
+    }
+
     @EventListener(OffboardingFinishedEvent.class)
-    public void stopLeds() {
+    public void stopStatusLeds() {
         green.turnOff();
         red.turnOff();
+        logger.info("Status led(s) turned off");
     }
 
     private DeviceRegistryRequestDTO getDeviceRegistryRequest(String ipAddress, String macAddress, String validity,
@@ -189,6 +205,7 @@ public class ElectricCarApplication {
     }
 
     private ServiceRegistryRequestDTO getServiceRegistryRequest(String ipAddress, final int port, final String validity,
+                                                                final String rfid,
                                                                 final String authInfo, final String uriPostfix,
                                                                 final String serviceDef) {
         final ServiceRegistryRequestDTO requestDTO = new ServiceRegistryRequestDTO();
@@ -198,6 +215,7 @@ public class ElectricCarApplication {
         requestDTO.setEndOfValidity(validity);
         requestDTO.setProviderSystem(getSystemRequest(ipAddress, port, authInfo));
         requestDTO.setServiceDefinition(serviceDef);
+        requestDTO.setMetadata(Map.of("rfid", rfid));
         return requestDTO;
     }
 
@@ -221,10 +239,4 @@ public class ElectricCarApplication {
         return new SystemRequestDTO(commonName, ipAddress, port, authInfo);
     }
 
-    @EventListener(OnboardingFinishedEvent.class)
-    public void startWebServer() throws IOException {
-        httpServer.init();
-        httpServer.start();
-        green.turnOn();
-    }
 }

@@ -22,7 +22,7 @@ public class GroveUltrasonicRanger {
       io.write(uRead_cmd, pin, unused, unused);
       io.sleep(200);
       int[] v = GroveUtil.unsign(io.read(new byte[4]));
-      return (v[1] * 256) + v[2];
+        return (v[1] * 256.0) + v[2];
     });
   }
 

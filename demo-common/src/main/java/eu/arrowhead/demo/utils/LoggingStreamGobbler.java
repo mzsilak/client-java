@@ -23,7 +23,6 @@ public class LoggingStreamGobbler extends StreamGobbler {
         private final String prefix;
 
         public LoggingConsumer(Level level, String prefix) {
-
             this.level = level;
             this.prefix = prefix;
         }
@@ -31,6 +30,15 @@ public class LoggingStreamGobbler extends StreamGobbler {
         @Override
         public void accept(String s) {
             logger.log(level, "{} {}", prefix, s);
+        }
+
+        @Override
+        public String toString() {
+            final StringBuilder sb = new StringBuilder("LoggingConsumer[");
+            sb.append("level=").append(level);
+            sb.append(", prefix='").append(prefix).append('\'');
+            sb.append(']');
+            return sb.toString();
         }
     }
 }

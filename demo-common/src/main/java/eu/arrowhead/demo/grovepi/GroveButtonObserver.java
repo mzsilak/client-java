@@ -14,59 +14,70 @@ import org.iot.raspberry.grovepi.GrovePi;
 
 public class GroveButtonObserver implements Runnable, GroveDigitalInListener {
 
-  private final Logger logger = LogManager.getLogger();
-  private final AtomicBoolean running = new AtomicBoolean(false);
+    private final Logger logger = LogManager.getLogger();
+    private final AtomicBoolean running = new AtomicBoolean(false);
 
-  private final ExecutorService executorService;
-  private final GroveDigitalIn button;
+    private final ExecutorService executorService;
+    private final GroveDigitalIn button;
 
-  private AtomicReference<Future<?>> futureReference = new AtomicReference<>();
-  private ButtonPressedListener listener = null;
+    private AtomicReference<Future<?>> futureReference = new AtomicReference<>(null);
+    private ButtonPressedListener listener = null;
 
 
-  public GroveButtonObserver(final ExecutorService executorService, final GrovePi grovePi, final int digitalPort)
-      throws IOException {
-    this.executorService = executorService;
-    button = grovePi.getDigitalIn(digitalPort); // D6
-    button.setListener(this);
-  }
-
-  public synchronized void start() {
-    if (Objects.nonNull(futureReference.get())) {
-      running.set(true);
-      final Future<?> submit = executorService.submit(this);
-      futureReference.set(submit);
+    public GroveButtonObserver(final ExecutorService executorService, final GrovePi grovePi, final int digitalPort)
+        throws IOException {
+        this.executorService = executorService;
+        button = grovePi.getDigitalIn(digitalPort);
+        button.setListener(this);
     }
-  }
 
-  public synchronized void stop() {
-    running.set(false);
-    futureReference.getAndSet(null).cancel(true);
-  }
-
-  @Override
-  public void run() {
-    while (running.get()) {
-      try {
-        button.get();
-        Thread.sleep(200L);
-      } catch (InterruptedException | IOException e) {
-        logger.debug(e.getMessage());
-      }
+    public synchronized void start() {
+        if (Objects.isNull(futureReference.get())) {
+            logger.info("start");
+            running.set(true);
+            final Future<?> submit = executorService.submit(this);
+            futureReference.set(submit);
+        } else {
+            logger.warn("Ignore call to start as it is running already");
+        }
     }
-  }
 
-  public void setListener(final ButtonPressedListener listener) {
-    this.listener = listener;
-  }
+    public synchronized void stop() {
+        logger.info("stop");
+        running.set(false);
+        final Future<?> oldReference = futureReference.getAndSet(null);
+        if (Objects.nonNull(oldReference)) {
+            oldReference.cancel(true);
+        } else {
+            logger.warn("Ignore call to stop as it is not running");
+        }
+    }
 
-  @Override
-  public void onChange(boolean oldValue, boolean newValue) {
-    if (listener == null) {
-      return;
+    @Override
+    public void run() {
+        while (running.get()) {
+            try {
+                logger.trace("fetch button");
+                button.get();
+                Thread.sleep(200L);
+            } catch (InterruptedException | IOException e) {
+                logger.debug(e.getMessage());
+            }
+        }
     }
-    if (!oldValue && newValue) {
-      listener.trigger();
+
+    public void setListener(final ButtonPressedListener listener) {
+        this.listener = listener;
     }
-  }
+
+    @Override
+    public void onChange(boolean oldValue, boolean newValue) {
+        logger.info("Change detected - oldValue:{}, newValue:{}", oldValue, newValue);
+        if (listener == null) {
+            return;
+        }
+        if (!oldValue && newValue) {
+            listener.trigger();
+        }
+    }
 }

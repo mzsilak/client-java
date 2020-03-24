@@ -1,18 +1,11 @@
 package eu.arrowhead.client.station;
 
 import eu.arrowhead.common.CommonConstants;
-import eu.arrowhead.demo.grovepi.ControllableLed;
 import eu.arrowhead.demo.grovepi.mocks.FakeGrovePI;
 import eu.arrowhead.demo.grovepi.mocks.FakeLed;
-import eu.arrowhead.demo.utils.ProcessTemplate;
-import eu.arrowhead.demo.web.HttpServerCustomizer;
 import java.io.IOException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import org.iot.raspberry.grovepi.GrovePi;
 import org.iot.raspberry.grovepi.devices.GroveLed;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

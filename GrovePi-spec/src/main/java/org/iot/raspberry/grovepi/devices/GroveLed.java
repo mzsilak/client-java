@@ -14,26 +14,29 @@ import org.iot.raspberry.grovepi.GrovePi;
 @GroveDigitalPin
 public class GroveLed {
 
-  public static int MAX_BRIGTHNESS = 255;
-
-  private final GrovePi grovePi;
+    public static int MAX_BRIGTHNESS = 255;
     protected final int pin;
+    private final GrovePi grovePi;
 
-  public GroveLed(GrovePi grovePi, int pin) throws IOException {
-    this.grovePi = grovePi;
-    this.pin = pin;
-    grovePi.execVoid((GroveIO io) -> io.write(pMode_cmd, pin, pMode_out_arg, unused));
-    set(false);
-  }
+    public GroveLed(GrovePi grovePi, int pin) throws IOException {
+        this.grovePi = grovePi;
+        this.pin = pin;
+        grovePi.execVoid((GroveIO io) -> io.write(pMode_cmd, pin, pMode_out_arg, unused));
+        set(false);
+    }
 
-  public void set(boolean value) throws IOException {
-    int val = value ? 1 : 0;
-    grovePi.execVoid((GroveIO io) -> io.write(dWrite_cmd, pin, val, unused));
-  }
+    public void set(boolean value) throws IOException {
+        int val = value ? 1 : 0;
+        grovePi.execVoid((GroveIO io) -> io.write(dWrite_cmd, pin, val, unused));
+    }
 
-  public void set(int value) throws IOException {
-    final int val = Math.max(0, Math.min(value, MAX_BRIGTHNESS));
-    grovePi.execVoid((GroveIO io) -> io.write(aWrite_cmd, pin, val, unused));
-  }
+    public void set(int value) throws IOException {
+        final int val = Math.max(0, Math.min(value, MAX_BRIGTHNESS));
+        grovePi.execVoid((GroveIO io) -> io.write(aWrite_cmd, pin, val, unused));
+    }
 
+    @Override
+    public String toString() {
+        return "GroveLed:" + pin;
+    }
 }

@@ -23,6 +23,8 @@ public class BlinkingLedRunnable implements Runnable {
     public synchronized void start() {
         if (!running.compareAndExchange(false, true)) {
             executorService.execute(this);
+        } else {
+            logger.debug("Ignored start on " + led.toString());
         }
     }
 
@@ -34,6 +36,7 @@ public class BlinkingLedRunnable implements Runnable {
     public void run() {
         while (running.get()) {
             try {
+                logger.trace("blink " + led.toString());
                 state = !state;
                 led.set(state);
                 Thread.sleep(500L);
@@ -42,5 +45,6 @@ public class BlinkingLedRunnable implements Runnable {
                 logger.error(e.getMessage());
             }
         }
+        logger.debug("Finished blinking on " + led.toString());
     }
 }
