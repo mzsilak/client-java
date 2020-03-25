@@ -24,6 +24,7 @@ import java.security.cert.CertificateException;
 import java.security.spec.InvalidKeySpecException;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.ServiceConfigurationError;
 import javax.annotation.PreDestroy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -48,6 +49,11 @@ public class ChargingStationApplication {
     private final ControllableLed green;
     private final ControllableLed red;
 
+    private final String ipAddress;
+    private final String macAddress;
+    private final String validity;
+    private final int port;
+
     @Autowired
     public ChargingStationApplication(final ApplicationEventPublisher applicationEventPublisher,
                                       final HttpServer httpServer, final ArrowheadHandler onboardingHandler,
@@ -64,8 +70,11 @@ public class ChargingStationApplication {
         this.red = red;
 
         httpServer.configureName(commonName);
-        onboardingHandler.onboard(new OnboardingWithNameRequestDTO(commonName));
-        performOffboarding();
+
+        ipAddress = IpUtilities.getAddressString();
+        macAddress = IpUtilities.getMacAddress(ipAddress);
+        validity = Utilities.convertZonedDateTimeToUTCString(ZonedDateTime.now().plusDays(1));
+        port = httpServer.getPort();
     }
 
     @PreDestroy
@@ -76,7 +85,7 @@ public class ChargingStationApplication {
             green.blink();
             red.blink();
 
-            final String ipAddress = IpUtilities.getIpAddress();
+            final String ipAddress = IpUtilities.getAddressString();
             final String macAddress = IpUtilities.getMacAddress();
             final int port = httpServer.getPort();
 
@@ -105,11 +114,7 @@ public class ChargingStationApplication {
             green.blink();
             red.blink();
 
-            final String ipAddress = IpUtilities.getIpAddress();
-            final String macAddress = IpUtilities.getMacAddress();
-            final String validity = Utilities.convertZonedDateTimeToUTCString(ZonedDateTime.now().plusDays(1));
-            final int port = httpServer.getPort();
-
+            onboardingHandler.onboard(new OnboardingWithNameRequestDTO(commonName));
             final String authInfo = onboardingHandler.getAuthInfo();
 
             onboardingHandler.registerDevice(getDeviceRegistryRequest(ipAddress, macAddress, validity, authInfo));
@@ -123,12 +128,15 @@ public class ChargingStationApplication {
             onboardingHandler.registerService(
                 getServiceRegistryRequest(ipAddress, port, validity, authInfo, Constants.OP_STATION_UNREGISTER_URI,
                                           Constants.SERVICE_STATION_UNREGISTER));
+
+            logger.info("Firing OnboardingFinishedEvent ...");
+            applicationEventPublisher.publishEvent(new OnboardingFinishedEvent(this));
         } catch (final Exception e) {
             logger.warn("Issues during onboarding: {}", e.getMessage());
+            performOffboarding();
+            throw new ServiceConfigurationError(e.getMessage());
         }
 
-        logger.info("Firing OnboardingFinishedEvent ...");
-        applicationEventPublisher.publishEvent(new OnboardingFinishedEvent(this));
         red.turnOff();
     }
 
@@ -165,10 +173,15 @@ public class ChargingStationApplication {
         return new SystemRequestDTO(commonName, ipAddress, port, authInfo);
     }
 
+    public SystemRequestDTO getSystemRequest() {
+        return new SystemRequestDTO(commonName, ipAddress, port, onboardingHandler.getAuthInfo());
+    }
+
     @EventListener(OnboardingFinishedEvent.class)
     public void startWebServer() throws IOException {
         httpServer.init();
         httpServer.start();
         green.turnOn();
     }
+
 }

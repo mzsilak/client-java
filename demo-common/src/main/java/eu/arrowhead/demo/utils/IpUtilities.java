@@ -3,6 +3,7 @@ package eu.arrowhead.demo.utils;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -17,7 +18,7 @@ public class IpUtilities {
   addresses are prioritized over private
     (site local) IP addresses */
     @SuppressWarnings("unused")
-    public static String getIpAddress() throws SocketException {
+    public static String getAddressString() throws SocketException {
         return getInetAddress().getHostAddress();
     }
 
@@ -49,8 +50,10 @@ public class IpUtilities {
     }
 
     public static String getMacAddress() throws SocketException {
-        final InetAddress inetAddress = getInetAddress();
+        return getMacAddress(getInetAddress());
+    }
 
+    public static String getMacAddress(final InetAddress inetAddress) throws SocketException {
         NetworkInterface network = NetworkInterface.getByInetAddress(inetAddress);
         byte[] mac = network.getHardwareAddress();
 
@@ -60,5 +63,9 @@ public class IpUtilities {
         }
 
         return sb.toString();
+    }
+
+    public static String getMacAddress(final String address) throws SocketException, UnknownHostException {
+        return getMacAddress(InetAddress.getByName(address));
     }
 }

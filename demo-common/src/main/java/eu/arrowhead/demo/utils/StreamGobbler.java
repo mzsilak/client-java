@@ -15,14 +15,14 @@ public class StreamGobbler implements Runnable {
     private Consumer<String> consumer;
 
     public StreamGobbler(final InputStream inputStream, final Consumer<String> consumer) {
-        logger.info("Created new {} for consumer {}", getClass().getSimpleName(), consumer);
+        logger.info("Created new {} for consumer {}", getClass().getSimpleName(), consumer.getClass().getSimpleName());
         this.inputStream = inputStream;
         this.consumer = consumer;
     }
 
     @Override
     public void run() {
-        logger.info("{} running for {}", getClass().getSimpleName(), consumer);
+        logger.debug("{} running for {}", getClass().getSimpleName(), consumer);
         try (final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
             String line;
             while ((line = reader.readLine()) != null) {
@@ -36,6 +36,6 @@ public class StreamGobbler implements Runnable {
         } catch (final IOException e) {
             logger.error("StreamGobbler failed with: {}", e.getMessage());
         }
-        logger.info("{} finished for {}", getClass().getSimpleName(), consumer);
+        logger.debug("{} finished for {}", getClass().getSimpleName(), consumer);
     }
 }

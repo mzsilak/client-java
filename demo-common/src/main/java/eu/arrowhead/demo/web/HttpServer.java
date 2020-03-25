@@ -99,8 +99,7 @@ public class HttpServer {
         state.set(LifeCycle.INITIALIZED);
     }
 
-    @PreDestroy
-    public void stop() {
+    public synchronized void stop() {
         if (state.compareAndExchange(LifeCycle.STARTED, LifeCycle.STOPPING) == LifeCycle.STARTED) {
             logger.info("Stopping HTTP Server");
             final var shutdown = server.shutdown(30, TimeUnit.SECONDS);
@@ -108,6 +107,8 @@ public class HttpServer {
                 server.shutdownNow();
             }
             state.set(LifeCycle.INITIALIZED);
+        } else {
+            logger.warn("Stop denied. Current state={}", state.get());
         }
     }
 
@@ -136,11 +137,20 @@ public class HttpServer {
         return Utilities.createURI(scheme, host, port, "/").toUri();
     }
 
-    public void start() throws IOException {
+    public synchronized void start() throws IOException {
         if (state.compareAndExchange(LifeCycle.INITIALIZED, LifeCycle.STARTING) == LifeCycle.INITIALIZED) {
             logger.info("Starting HTTP Server");
             server.start();
             state.set(LifeCycle.STARTED);
+        }
+    }
+
+    @PreDestroy
+    public synchronized void shutdown() {
+        if (Objects.nonNull(server)) {
+            logger.info("Shutting down HTTP Server");
+            server.shutdown(5, TimeUnit.SECONDS);
+            server.shutdownNow();
         }
     }
 

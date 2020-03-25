@@ -35,6 +35,7 @@
     <module>eisenstadt-demo-car-exec</module>
     <module>eisenstadt-demo-station-exec</module>
     <module>eisenstadt-demo-led</module>
+    <module>eisenstadt-demo-rfid</module>
   </modules>
 
   <properties>

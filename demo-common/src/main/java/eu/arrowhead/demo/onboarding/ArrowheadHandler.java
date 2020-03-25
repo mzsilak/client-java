@@ -11,6 +11,7 @@ import eu.arrowhead.common.dto.shared.OnboardingWithNameResponseDTO;
 import eu.arrowhead.common.dto.shared.OrchestrationFlags;
 import eu.arrowhead.common.dto.shared.OrchestrationFormRequestDTO;
 import eu.arrowhead.common.dto.shared.OrchestrationResponseDTO;
+import eu.arrowhead.common.dto.shared.OrchestrationResultDTO;
 import eu.arrowhead.common.dto.shared.ServiceEndpoint;
 import eu.arrowhead.common.dto.shared.ServiceQueryFormDTO;
 import eu.arrowhead.common.dto.shared.ServiceQueryResultDTO;
@@ -27,6 +28,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.List;
 import java.util.Objects;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -179,19 +181,14 @@ public class ArrowheadHandler {
         return UriComponentsBuilder.fromUri(orchestrationService.getUri()).build();
     }
 
-    public UriComponents createUri(final String serviceDef) {
-        final ServiceQueryFormDTO serviceQueryFormDTO = new ServiceQueryFormDTO.Builder(serviceDef)
-            .interfaces(CommonConstants.HTTP_SECURE_JSON).build();
-        return createUri(serviceQueryFormDTO);
+    public UriComponents createUri(final ServiceQueryFormDTO serviceQueryFormDTO, final SystemRequestDTO requester) {
+        final OrchestrationResponseDTO orchestration = lookupOrchestration(serviceQueryFormDTO, requester);
+        final List<OrchestrationResultDTO> response = orchestration.getResponse();
+        return createUri(response.get(0));
     }
 
-    public UriComponents createUri(final ServiceQueryFormDTO serviceQueryFormDTO) {
-        final ServiceQueryResultDTO serviceQueryResultDTO = lookupServiceRegistry(serviceQueryFormDTO);
-        final ServiceRegistryResponseDTO responseDto = serviceQueryResultDTO.getServiceQueryData().get(0);
-        return createUri(responseDto);
-    }
 
-    public ServiceQueryResultDTO lookupServiceRegistry(final ServiceQueryFormDTO srQueryForm) {
+    private ServiceQueryResultDTO lookupServiceRegistry(final ServiceQueryFormDTO srQueryForm) {
         final UriComponents srQueryUri = UriComponentsBuilder.fromUri(serviceRegistry.getUri()).replacePath(
             CommonConstants.SERVICE_REGISTRY_URI + CommonConstants.OP_SERVICE_REGISTRY_QUERY_URI).build();
 
@@ -211,4 +208,10 @@ public class ArrowheadHandler {
                                    srResponseDto.getProvider().getPort(), srResponseDto.getServiceUri());
     }
 
+
+    public UriComponents createUri(final OrchestrationResultDTO resultDTO) {
+        return Utilities
+            .createURI(httpClient.getScheme(), resultDTO.getProvider().getAddress(), resultDTO.getProvider().getPort(),
+                       resultDTO.getServiceUri());
+    }
 }

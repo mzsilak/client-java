@@ -5,10 +5,9 @@ import eu.arrowhead.common.Utilities;
 import eu.arrowhead.common.dto.shared.DeviceRegistryRequestDTO;
 import eu.arrowhead.common.dto.shared.DeviceRequestDTO;
 import eu.arrowhead.common.dto.shared.OnboardingWithNameRequestDTO;
+import eu.arrowhead.common.dto.shared.OrchestrationResponseDTO;
 import eu.arrowhead.common.dto.shared.ServiceQueryFormDTO;
-import eu.arrowhead.common.dto.shared.ServiceQueryResultDTO;
 import eu.arrowhead.common.dto.shared.ServiceRegistryRequestDTO;
-import eu.arrowhead.common.dto.shared.ServiceRegistryResponseDTO;
 import eu.arrowhead.common.dto.shared.ServiceSecurityType;
 import eu.arrowhead.common.dto.shared.SystemRegistryRequestDTO;
 import eu.arrowhead.common.dto.shared.SystemRequestDTO;
@@ -64,11 +63,16 @@ public class ElectricCarApplication {
     private final ControllableLed green;
     private final ControllableLed red;
 
+    private final String ipAddress;
+    private final String macAddress;
+    private final String validity;
+    private final int port;
+
     @Autowired
     public ElectricCarApplication(final ApplicationEventPublisher applicationEventPublisher,
                                   final HttpServer httpServer, final ArrowheadHandler onboardingHandler,
                                   final HttpClient httpClient, @Value("${server.name}") final String commonName,
-                                  @Value("${server.rfid}") String rfid,
+                                  @Value("${server.rfid}") final String rfid,
                                   @Qualifier("greenControl") final ControllableLed green,
                                   @Qualifier("redControl") final ControllableLed red,
                                   final GroveButtonObserver buttonObserver)
@@ -86,8 +90,10 @@ public class ElectricCarApplication {
         httpServer.configureName(commonName);
         buttonObserver.setListener(this::toggleOnboarding);
 
-        onboardingHandler.onboard(new OnboardingWithNameRequestDTO(commonName));
-        performOffboarding();
+        ipAddress = IpUtilities.getAddressString();
+        macAddress = IpUtilities.getMacAddress(ipAddress);
+        validity = Utilities.convertZonedDateTimeToUTCString(ZonedDateTime.now().plusDays(1));
+        port = httpServer.getPort();
 
         buttonObserver.start();
         logger.info("Listening to button");
@@ -110,9 +116,6 @@ public class ElectricCarApplication {
             red.blink();
 
             logger.info("Unregistering myself ...");
-            final String ipAddress = IpUtilities.getIpAddress();
-            final String macAddress = IpUtilities.getMacAddress();
-            final int port = httpServer.getPort();
 
             try {
                 if (onboarded.get()) {
@@ -129,7 +132,7 @@ public class ElectricCarApplication {
             onboardingHandler.unregisterDevice(commonName, macAddress);
 
         } catch (final Exception e) {
-            logger.warn("Offboarding issue: {}", e.getMessage());
+            logger.warn("Offboarding issue: {}: {}", e.getClass().getSimpleName(), e.getMessage());
         } finally {
             onboarded.set(false);
             stopStatusLeds();
@@ -142,11 +145,7 @@ public class ElectricCarApplication {
             red.blink();
 
             logger.info("Start onboarding ...");
-
-            final String ipAddress = IpUtilities.getIpAddress();
-            final String macAddress = IpUtilities.getMacAddress();
-            final String validity = Utilities.convertZonedDateTimeToUTCString(ZonedDateTime.now().plusDays(1));
-            final int port = httpServer.getPort();
+            onboardingHandler.onboard(new OnboardingWithNameRequestDTO(commonName));
 
             final String authInfo = onboardingHandler.getAuthInfo();
 
@@ -170,7 +169,8 @@ public class ElectricCarApplication {
             red.turnOff();
             onboarded.set(true);
         } catch (final Exception e) {
-            logger.warn("Onboarding issue: {}", e.getMessage());
+            logger.warn("Onboarding issue: {}: {}", e.getClass().getSimpleName(), e.getMessage());
+            performOffboarding();
         }
     }
 
@@ -205,9 +205,8 @@ public class ElectricCarApplication {
     }
 
     private ServiceRegistryRequestDTO getServiceRegistryRequest(String ipAddress, final int port, final String validity,
-                                                                final String rfid,
-                                                                final String authInfo, final String uriPostfix,
-                                                                final String serviceDef) {
+                                                                final String rfid, final String authInfo,
+                                                                final String uriPostfix, final String serviceDef) {
         final ServiceRegistryRequestDTO requestDTO = new ServiceRegistryRequestDTO();
         requestDTO.setSecure(ServiceSecurityType.CERTIFICATE.name());
         requestDTO.setServiceUri(Constants.CAR_CONTROLLER_PATH + uriPostfix);
@@ -223,12 +222,13 @@ public class ElectricCarApplication {
         final ServiceQueryFormDTO serviceQueryFormDTO = new ServiceQueryFormDTO.Builder(serviceDef)
             .interfaces(CommonConstants.HTTP_SECURE_JSON).build();
 
-        final ServiceQueryResultDTO serviceQueryResultDTO = onboardingHandler
-            .lookupServiceRegistry(serviceQueryFormDTO);
+        final String authInfo = onboardingHandler.getAuthInfo();
+        final SystemRequestDTO systemRequest = getSystemRequest(ipAddress, port, authInfo);
 
-        final ServiceRegistryResponseDTO responseDto = serviceQueryResultDTO.getServiceQueryData().get(0);
-        return Utilities.createURI(httpClient.getScheme(), responseDto.getProvider().getAddress(),
-                                   responseDto.getProvider().getPort(), responseDto.getServiceUri());
+        final OrchestrationResponseDTO orchestrationResponseDTO = onboardingHandler
+            .lookupOrchestration(serviceQueryFormDTO, systemRequest);
+
+        return onboardingHandler.createUri(orchestrationResponseDTO.getResponse().get(0));
     }
 
     private DeviceRequestDTO getDeviceRequest(String ipAddress, String macAddress, String authInfo) {

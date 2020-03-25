@@ -1,8 +1,11 @@
 package eu.arrowhead.demo.grovepi;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.iot.raspberry.grovepi.devices.GroveLed;
@@ -11,6 +14,7 @@ public class BlinkingLedRunnable implements Runnable {
 
     private final Logger logger = LogManager.getLogger();
     private final AtomicBoolean running = new AtomicBoolean(false);
+    private final AtomicReference<Future<?>> reference = new AtomicReference<>(null);
     private final ExecutorService executorService;
     private final GroveLed led;
     private boolean state = false;
@@ -22,7 +26,11 @@ public class BlinkingLedRunnable implements Runnable {
 
     public synchronized void start() {
         if (!running.compareAndExchange(false, true)) {
-            executorService.execute(this);
+
+            final Future<?> oldRef = reference.getAndSet(executorService.submit(this));
+            if (Objects.nonNull(oldRef)) {
+                oldRef.cancel(true);
+            }
         } else {
             logger.debug("Ignored start on " + led.toString());
         }

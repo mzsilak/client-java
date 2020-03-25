@@ -2,8 +2,8 @@ package eu.arrowhead.client.station;
 
 import eu.arrowhead.common.CommonConstants;
 import eu.arrowhead.demo.grovepi.ControllableLed;
+import eu.arrowhead.demo.grovepi.mocks.FakeGrovePI;
 import eu.arrowhead.demo.hk2.JacksonJsonProviderAtRest;
-import eu.arrowhead.demo.utils.ProcessInputHandler;
 import eu.arrowhead.demo.utils.ProcessTemplate;
 import eu.arrowhead.demo.web.HttpServerCustomizer;
 import java.io.IOException;
@@ -11,7 +11,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.iot.raspberry.grovepi.GrovePi;
 import org.iot.raspberry.grovepi.devices.GroveLed;
-import org.iot.raspberry.grovepi.pi4j.GrovePi4J;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -34,7 +33,7 @@ public class StationMain {
 
     @Bean
     public GrovePi grovePi() throws IOException {
-        return new GrovePi4J(); // TODO can't read RFID at the same as GrovePi
+        return new FakeGrovePI(); // TODO can't read RFID at the same as GrovePi
     }
 
     @Bean(destroyMethod = "shutdownNow")
@@ -65,8 +64,11 @@ public class StationMain {
     }
 
     @Bean("rfid")
-    public ProcessInputHandler rfidProcess(final ExecutorService executorService) {
-        return new ProcessInputHandler(executorService);
+    public ProcessTemplate rfidProcess(final ExecutorService executorService,
+                                       @Value("${command.rfid}") final String rfid) {
+        final ProcessTemplate template = new ProcessTemplate(rfid.split("\\s"));
+        template.executor(executorService);
+        return template;
     }
 
     @Bean("powerOn")
@@ -92,7 +94,6 @@ public class StationMain {
                                             @Value("${command.power.status}") final String power) {
         final ProcessTemplate template = new ProcessTemplate(power.split("\\s"));
         template.executor(executorService);
-        template.manualInputStream(true);
         return template;
     }
 

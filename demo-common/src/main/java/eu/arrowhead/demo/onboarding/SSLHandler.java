@@ -126,7 +126,7 @@ public class SSLHandler {
                                 final String cloudCert, final String rootCert)
         throws CertificateException, IOException, InvalidKeySpecException, NoSuchAlgorithmException, KeyStoreException {
         logger.info("Adapting SSLContext ...");
-        return; /*
+        // return; /*
         logger.debug("Decoding private key ...");
         final PrivateKey privateKey = SSLUtilities
             .parsePrivateKey(response.getPrivateKey(), response.getKeyAlgorithm());
@@ -147,7 +147,7 @@ public class SSLHandler {
                   sslProperties.getKeyStorePassword());
 
         loadStore(trustStore, sslProperties.getTrustStore(), sslProperties.getKeyStoreType(),
-                  sslProperties.getTrustStorePassword()); */
+                  sslProperties.getTrustStorePassword());
     }
 
     private X509Certificate parseCertificate(final String certificateString, final String format)
@@ -184,7 +184,7 @@ public class SSLHandler {
         final String alias = Utilities.getCertCNFromSubject(certificate.getSubjectDN().getName());
         logger.debug("Saving trusted certificate '{}' as '{}'", certificate.getSubjectX500Principal(), alias);
 
-        // keyStore.setCertificateEntry(alias, certificate);
+        keyStore.setCertificateEntry(alias, certificate);
         trustStore.setCertificateEntry(alias, certificate);
 
         saveStore(keyStore, sslProperties.getKeyStore(), sslProperties.getKeyStorePassword());
