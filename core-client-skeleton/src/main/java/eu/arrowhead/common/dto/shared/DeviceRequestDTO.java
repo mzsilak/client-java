@@ -2,9 +2,9 @@ package eu.arrowhead.common.dto.shared;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.StringJoiner;
 
 @JsonInclude(Include.NON_NULL)
 public class DeviceRequestDTO implements Serializable
@@ -25,6 +25,11 @@ public class DeviceRequestDTO implements Serializable
 
     //-------------------------------------------------------------------------------------------------
     public DeviceRequestDTO() {}
+
+    public DeviceRequestDTO(final String deviceName, final String macAddress) {
+        this.deviceName = deviceName;
+        this.macAddress = macAddress;
+    }
 
     //-------------------------------------------------------------------------------------------------
     public DeviceRequestDTO(final String deviceName, final String address, final String macAddress, final String authenticationInfo)
@@ -81,5 +86,12 @@ public class DeviceRequestDTO implements Serializable
         return Objects.equals(address, other.address) &&
                 Objects.equals(macAddress, other.macAddress) &&
                 Objects.equals(deviceName, other.deviceName);
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", DeviceRequestDTO.class.getSimpleName() + "[", "]")
+            .add("deviceName='" + deviceName + "'").add("address='" + address + "'")
+            .add("macAddress='" + macAddress + "'").add("authenticationInfo='" + authenticationInfo + "'").toString();
     }
 }

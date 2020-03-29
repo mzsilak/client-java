@@ -4,8 +4,8 @@ import eu.arrowhead.common.CommonConstants;
 import eu.arrowhead.common.Utilities;
 import eu.arrowhead.common.core.CoreSystem;
 import eu.arrowhead.common.core.CoreSystemService;
-import eu.arrowhead.common.dto.shared.DeviceRegistryRequestDTO;
-import eu.arrowhead.common.dto.shared.DeviceRegistryResponseDTO;
+import eu.arrowhead.common.dto.shared.DeviceRegistryOnboardingWithNameRequestDTO;
+import eu.arrowhead.common.dto.shared.DeviceRegistryOnboardingWithNameResponseDTO;
 import eu.arrowhead.common.dto.shared.OnboardingWithNameRequestDTO;
 import eu.arrowhead.common.dto.shared.OnboardingWithNameResponseDTO;
 import eu.arrowhead.common.dto.shared.OrchestrationFlags;
@@ -17,8 +17,8 @@ import eu.arrowhead.common.dto.shared.ServiceQueryFormDTO;
 import eu.arrowhead.common.dto.shared.ServiceQueryResultDTO;
 import eu.arrowhead.common.dto.shared.ServiceRegistryRequestDTO;
 import eu.arrowhead.common.dto.shared.ServiceRegistryResponseDTO;
-import eu.arrowhead.common.dto.shared.SystemRegistryRequestDTO;
-import eu.arrowhead.common.dto.shared.SystemRegistryResponseDTO;
+import eu.arrowhead.common.dto.shared.SystemRegistryOnboardingWithNameRequestDTO;
+import eu.arrowhead.common.dto.shared.SystemRegistryOnboardingWithNameResponseDTO;
 import eu.arrowhead.common.dto.shared.SystemRequestDTO;
 import eu.arrowhead.common.exception.ArrowheadException;
 import eu.arrowhead.demo.ssl.SSLException;
@@ -86,8 +86,8 @@ public class ArrowheadHandler {
 
         logger.info("Saving certificates ...");
         sslHandler.adaptSSLContext(onboardingRequest.getCreationRequestDTO().getCommonName(),
-                                   responseDTO.getCertificateType(), responseDTO.getOnboardingCertificate(),
-                                   responseDTO.getIntermediateCertificate(), responseDTO.getRootCertificate());
+                                   responseDTO.getOnboardingCertificate(), responseDTO.getIntermediateCertificate(),
+                                   responseDTO.getRootCertificate());
 
         httpClient.setSecure();
     }
@@ -96,8 +96,8 @@ public class ArrowheadHandler {
         return sslHandler.getEncodedPublicKey();
     }
 
-    public void registerDevice(final DeviceRegistryRequestDTO registryRequestDTO) {
-        register(registryRequestDTO, DeviceRegistryResponseDTO.class, deviceRegistry.getUri());
+    public void registerDevice(final DeviceRegistryOnboardingWithNameRequestDTO registryRequestDTO) {
+        register(registryRequestDTO, DeviceRegistryOnboardingWithNameResponseDTO.class, deviceRegistry.getUri());
     }
 
     private <REQ, RES> RES register(final REQ registryRequest, final Class<RES> responseCls, final URI uri) {
@@ -107,8 +107,8 @@ public class ArrowheadHandler {
         return responseEntity.getBody();
     }
 
-    public void registerSystem(final SystemRegistryRequestDTO registryRequestDTO) {
-        register(registryRequestDTO, SystemRegistryResponseDTO.class, systemRegistry.getUri());
+    public void registerSystem(final SystemRegistryOnboardingWithNameRequestDTO registryRequestDTO) {
+        register(registryRequestDTO, SystemRegistryOnboardingWithNameResponseDTO.class, systemRegistry.getUri());
     }
 
     public void registerService(final ServiceRegistryRequestDTO registryRequestDTO) {
@@ -161,6 +161,12 @@ public class ArrowheadHandler {
         }
     }
 
+    public UriComponents createUri(final ServiceQueryFormDTO serviceQueryFormDTO, final SystemRequestDTO requester) {
+        final OrchestrationResponseDTO orchestration = lookupOrchestration(serviceQueryFormDTO, requester);
+        final List<OrchestrationResultDTO> response = orchestration.getResponse();
+        return createUri(response.get(0));
+    }
+
     public OrchestrationResponseDTO lookupOrchestration(final ServiceQueryFormDTO queryFormDTO,
                                                         final SystemRequestDTO requester) {
         final OrchestrationFormRequestDTO orchForm = new OrchestrationFormRequestDTO.Builder(requester)
@@ -177,16 +183,15 @@ public class ArrowheadHandler {
         return orchQueryResult;
     }
 
+    public UriComponents createUri(final OrchestrationResultDTO resultDTO) {
+        return Utilities
+            .createURI(httpClient.getScheme(), resultDTO.getProvider().getAddress(), resultDTO.getProvider().getPort(),
+                       resultDTO.getServiceUri());
+    }
+
     public UriComponents orchestrationUri() {
         return UriComponentsBuilder.fromUri(orchestrationService.getUri()).build();
     }
-
-    public UriComponents createUri(final ServiceQueryFormDTO serviceQueryFormDTO, final SystemRequestDTO requester) {
-        final OrchestrationResponseDTO orchestration = lookupOrchestration(serviceQueryFormDTO, requester);
-        final List<OrchestrationResultDTO> response = orchestration.getResponse();
-        return createUri(response.get(0));
-    }
-
 
     private ServiceQueryResultDTO lookupServiceRegistry(final ServiceQueryFormDTO srQueryForm) {
         final UriComponents srQueryUri = UriComponentsBuilder.fromUri(serviceRegistry.getUri()).replacePath(
@@ -206,12 +211,5 @@ public class ArrowheadHandler {
     public UriComponents createUri(final ServiceRegistryResponseDTO srResponseDto) {
         return Utilities.createURI(httpClient.getScheme(), srResponseDto.getProvider().getAddress(),
                                    srResponseDto.getProvider().getPort(), srResponseDto.getServiceUri());
-    }
-
-
-    public UriComponents createUri(final OrchestrationResultDTO resultDTO) {
-        return Utilities
-            .createURI(httpClient.getScheme(), resultDTO.getProvider().getAddress(), resultDTO.getProvider().getPort(),
-                       resultDTO.getServiceUri());
     }
 }

@@ -2,14 +2,15 @@ package eu.arrowhead.client.car;
 
 import eu.arrowhead.common.CommonConstants;
 import eu.arrowhead.common.Utilities;
-import eu.arrowhead.common.dto.shared.DeviceRegistryRequestDTO;
+import eu.arrowhead.common.dto.shared.CertificateCreationRequestDTO;
+import eu.arrowhead.common.dto.shared.DeviceRegistryOnboardingWithNameRequestDTO;
 import eu.arrowhead.common.dto.shared.DeviceRequestDTO;
 import eu.arrowhead.common.dto.shared.OnboardingWithNameRequestDTO;
 import eu.arrowhead.common.dto.shared.OrchestrationResponseDTO;
 import eu.arrowhead.common.dto.shared.ServiceQueryFormDTO;
 import eu.arrowhead.common.dto.shared.ServiceRegistryRequestDTO;
 import eu.arrowhead.common.dto.shared.ServiceSecurityType;
-import eu.arrowhead.common.dto.shared.SystemRegistryRequestDTO;
+import eu.arrowhead.common.dto.shared.SystemRegistryOnboardingWithNameRequestDTO;
 import eu.arrowhead.common.dto.shared.SystemRequestDTO;
 import eu.arrowhead.demo.dto.Constants;
 import eu.arrowhead.demo.dto.RegisterRequestDTO;
@@ -145,14 +146,18 @@ public class ElectricCarApplication {
             red.blink();
 
             logger.info("Start onboarding ...");
-            onboardingHandler.onboard(new OnboardingWithNameRequestDTO(commonName));
+            onboardingHandler.onboard(new OnboardingWithNameRequestDTO(new CertificateCreationRequestDTO(commonName)));
 
             final String authInfo = onboardingHandler.getAuthInfo();
 
-            final DeviceRegistryRequestDTO deviceRequest = getDeviceRegistryRequest(ipAddress, macAddress, validity,
-                                                                                    authInfo);
-            final SystemRegistryRequestDTO systemRequest = getSystemRegistryRequest(ipAddress, macAddress, port,
-                                                                                    validity, rfid, authInfo);
+            final DeviceRegistryOnboardingWithNameRequestDTO deviceRequest = getDeviceRegistryRequest(ipAddress,
+                                                                                                      macAddress,
+                                                                                                      validity,
+                                                                                                      authInfo);
+            final SystemRegistryOnboardingWithNameRequestDTO systemRequest = getSystemRegistryRequest(ipAddress,
+                                                                                                      macAddress, port,
+                                                                                                      validity, rfid,
+                                                                                                      authInfo);
             final ServiceRegistryRequestDTO serviceRequest = getServiceRegistryRequest(ipAddress, port, validity, rfid,
                                                                                        authInfo,
                                                                                        Constants.OP_CAR_RFID_URI,
@@ -189,19 +194,23 @@ public class ElectricCarApplication {
         logger.info("Status led(s) turned off");
     }
 
-    private DeviceRegistryRequestDTO getDeviceRegistryRequest(String ipAddress, String macAddress, String validity,
-                                                              String authInfo) {
+    private DeviceRegistryOnboardingWithNameRequestDTO getDeviceRegistryRequest(String ipAddress, String macAddress,
+                                                                                String validity, String authInfo) {
 
-        return new DeviceRegistryRequestDTO(getDeviceRequest(ipAddress, macAddress, authInfo), validity, null, null);
+        return new DeviceRegistryOnboardingWithNameRequestDTO(getDeviceRequest(ipAddress, macAddress, authInfo),
+                                                              validity, null, null,
+                                                              new CertificateCreationRequestDTO(commonName));
     }
 
-    private SystemRegistryRequestDTO getSystemRegistryRequest(String ipAddress, String macAddress, final int port,
-                                                              String validity, String rfid, String authInfo) {
+    private SystemRegistryOnboardingWithNameRequestDTO getSystemRegistryRequest(String ipAddress, String macAddress,
+                                                                                final int port, String validity,
+                                                                                String rfid, String authInfo) {
         final Map<String, String> metadata = new HashMap<>();
         metadata.put("rfid", rfid);
-        return new SystemRegistryRequestDTO(getSystemRequest(ipAddress, port, authInfo),
-                                            getDeviceRequest(ipAddress, macAddress, authInfo), validity, metadata,
-                                            null);
+        return new SystemRegistryOnboardingWithNameRequestDTO(getSystemRequest(ipAddress, port, authInfo),
+                                                              getDeviceRequest(ipAddress, macAddress, authInfo),
+                                                              validity, metadata, null,
+                                                              new CertificateCreationRequestDTO(commonName));
     }
 
     private ServiceRegistryRequestDTO getServiceRegistryRequest(String ipAddress, final int port, final String validity,

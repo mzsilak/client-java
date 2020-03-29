@@ -3,6 +3,7 @@ package eu.arrowhead.common.dto.shared;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import java.io.Serializable;
+import java.util.StringJoiner;
 
 @JsonInclude(Include.NON_NULL)
 public class OnboardingWithNameRequestDTO implements Serializable {
@@ -20,14 +21,6 @@ public class OnboardingWithNameRequestDTO implements Serializable {
     public OnboardingWithNameRequestDTO() {
     }
 
-    public OnboardingWithNameRequestDTO(final String commonName) {
-        this.creationRequestDTO = new CertificateCreationRequestDTO(commonName);
-    }
-
-    public OnboardingWithNameRequestDTO(final String commonName, final String publicKey, final String privateKey) {
-        this.creationRequestDTO = new CertificateCreationRequestDTO(commonName, publicKey, privateKey);
-    }
-
     public OnboardingWithNameRequestDTO(CertificateCreationRequestDTO creationRequestDTO) {
         this.creationRequestDTO = creationRequestDTO;
     }
@@ -42,5 +35,11 @@ public class OnboardingWithNameRequestDTO implements Serializable {
 
     public void setCreationRequestDTO(CertificateCreationRequestDTO creationRequestDTO) {
         this.creationRequestDTO = creationRequestDTO;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", OnboardingWithNameRequestDTO.class.getSimpleName() + "[", "]")
+            .add("creationRequestDTO=" + creationRequestDTO).add("parent=" + super.toString()).toString();
     }
 }

@@ -2,12 +2,13 @@ package eu.arrowhead.client.station;
 
 import eu.arrowhead.common.CommonConstants;
 import eu.arrowhead.common.Utilities;
-import eu.arrowhead.common.dto.shared.DeviceRegistryRequestDTO;
+import eu.arrowhead.common.dto.shared.CertificateCreationRequestDTO;
+import eu.arrowhead.common.dto.shared.DeviceRegistryOnboardingWithNameRequestDTO;
 import eu.arrowhead.common.dto.shared.DeviceRequestDTO;
 import eu.arrowhead.common.dto.shared.OnboardingWithNameRequestDTO;
 import eu.arrowhead.common.dto.shared.ServiceRegistryRequestDTO;
 import eu.arrowhead.common.dto.shared.ServiceSecurityType;
-import eu.arrowhead.common.dto.shared.SystemRegistryRequestDTO;
+import eu.arrowhead.common.dto.shared.SystemRegistryOnboardingWithNameRequestDTO;
 import eu.arrowhead.common.dto.shared.SystemRequestDTO;
 import eu.arrowhead.demo.dto.Constants;
 import eu.arrowhead.demo.events.OffboardingFinishedEvent;
@@ -77,6 +78,72 @@ public class ChargingStationApplication {
         port = httpServer.getPort();
     }
 
+    @EventListener(ApplicationReadyEvent.class)
+    public void performOnboarding() {
+
+        try {
+            green.blink();
+            red.blink();
+
+            final var creationRequest = new CertificateCreationRequestDTO(commonName);
+            onboardingHandler.onboard(new OnboardingWithNameRequestDTO(creationRequest));
+            final String authInfo = onboardingHandler.getAuthInfo();
+
+            onboardingHandler
+                .registerDevice(getDeviceRegistryRequest(ipAddress, macAddress, validity, authInfo, creationRequest));
+            onboardingHandler.registerSystem(
+                getSystemRegistryRequest(ipAddress, macAddress, port, validity, authInfo, creationRequest));
+            onboardingHandler.registerService(
+                getServiceRegistryRequest(ipAddress, port, validity, authInfo, Constants.OP_STATION_CHARGE_URI,
+                                          Constants.SERVICE_STATION_CHARGE));
+            onboardingHandler.registerService(
+                getServiceRegistryRequest(ipAddress, port, validity, authInfo, Constants.OP_STATION_REGISTER_URI,
+                                          Constants.SERVICE_STATION_REGISTER));
+            onboardingHandler.registerService(
+                getServiceRegistryRequest(ipAddress, port, validity, authInfo, Constants.OP_STATION_UNREGISTER_URI,
+                                          Constants.SERVICE_STATION_UNREGISTER));
+
+            logger.info("Firing OnboardingFinishedEvent ...");
+            applicationEventPublisher.publishEvent(new OnboardingFinishedEvent(this));
+        } catch (final Exception e) {
+            logger.warn("Issues during onboarding: {}", e.getMessage());
+            performOffboarding();
+            throw new ServiceConfigurationError(e.getMessage());
+        }
+
+        red.turnOff();
+    }
+
+    private DeviceRegistryOnboardingWithNameRequestDTO getDeviceRegistryRequest(String ipAddress, String macAddress,
+                                                                                String validity, String authInfo,
+                                                                                CertificateCreationRequestDTO creationRequest) {
+
+        return new DeviceRegistryOnboardingWithNameRequestDTO(getDeviceRequest(ipAddress, macAddress, authInfo),
+                                                              validity, null, null, creationRequest);
+    }
+
+    private SystemRegistryOnboardingWithNameRequestDTO getSystemRegistryRequest(String ipAddress, String macAddress,
+                                                                                final int port, String validity,
+                                                                                String authInfo,
+                                                                                CertificateCreationRequestDTO creationRequest) {
+        return new SystemRegistryOnboardingWithNameRequestDTO(getSystemRequest(ipAddress, port, authInfo),
+                                                              getDeviceRequest(ipAddress, macAddress, authInfo),
+                                                              validity, null, null, creationRequest);
+    }
+
+    private ServiceRegistryRequestDTO getServiceRegistryRequest(String ipAddress, final int port, final String validity,
+                                                                final String authInfo, final String uriPostfix,
+                                                                final String serviceDef) {
+        final ServiceRegistryRequestDTO requestDTO = new ServiceRegistryRequestDTO();
+        requestDTO.setSecure(ServiceSecurityType.CERTIFICATE.name());
+        requestDTO.setServiceUri(Constants.STATION_CONTROLLER_PATH + uriPostfix);
+        requestDTO.setInterfaces(List.of(CommonConstants.HTTP_SECURE_JSON));
+        requestDTO.setEndOfValidity(validity);
+        requestDTO.setProviderSystem(getSystemRequest(ipAddress, port, authInfo));
+        requestDTO.setServiceDefinition(serviceDef);
+        return requestDTO;
+    }
+
     @PreDestroy
     public void performOffboarding() {
         try {
@@ -101,76 +168,18 @@ public class ChargingStationApplication {
         }
     }
 
-    @EventListener(OffboardingFinishedEvent.class)
-    public void stopLeds() {
-        green.turnOff();
-        red.turnOff();
-    }
-
-    @EventListener(ApplicationReadyEvent.class)
-    public void performOnboarding() {
-
-        try {
-            green.blink();
-            red.blink();
-
-            onboardingHandler.onboard(new OnboardingWithNameRequestDTO(commonName));
-            final String authInfo = onboardingHandler.getAuthInfo();
-
-            onboardingHandler.registerDevice(getDeviceRegistryRequest(ipAddress, macAddress, validity, authInfo));
-            onboardingHandler.registerSystem(getSystemRegistryRequest(ipAddress, macAddress, port, validity, authInfo));
-            onboardingHandler.registerService(
-                getServiceRegistryRequest(ipAddress, port, validity, authInfo, Constants.OP_STATION_CHARGE_URI,
-                                          Constants.SERVICE_STATION_CHARGE));
-            onboardingHandler.registerService(
-                getServiceRegistryRequest(ipAddress, port, validity, authInfo, Constants.OP_STATION_REGISTER_URI,
-                                          Constants.SERVICE_STATION_REGISTER));
-            onboardingHandler.registerService(
-                getServiceRegistryRequest(ipAddress, port, validity, authInfo, Constants.OP_STATION_UNREGISTER_URI,
-                                          Constants.SERVICE_STATION_UNREGISTER));
-
-            logger.info("Firing OnboardingFinishedEvent ...");
-            applicationEventPublisher.publishEvent(new OnboardingFinishedEvent(this));
-        } catch (final Exception e) {
-            logger.warn("Issues during onboarding: {}", e.getMessage());
-            performOffboarding();
-            throw new ServiceConfigurationError(e.getMessage());
-        }
-
-        red.turnOff();
-    }
-
-    private DeviceRegistryRequestDTO getDeviceRegistryRequest(String ipAddress, String macAddress, String validity,
-                                                              String authInfo) {
-
-        return new DeviceRegistryRequestDTO(getDeviceRequest(ipAddress, macAddress, authInfo), validity, null, null);
-    }
-
-    private SystemRegistryRequestDTO getSystemRegistryRequest(String ipAddress, String macAddress, final int port,
-                                                              String validity, String authInfo) {
-        return new SystemRegistryRequestDTO(getSystemRequest(ipAddress, port, authInfo),
-                                            getDeviceRequest(ipAddress, macAddress, authInfo), validity, null, null);
-    }
-
-    private ServiceRegistryRequestDTO getServiceRegistryRequest(String ipAddress, final int port, final String validity,
-                                                                final String authInfo, final String uriPostfix,
-                                                                final String serviceDef) {
-        final ServiceRegistryRequestDTO requestDTO = new ServiceRegistryRequestDTO();
-        requestDTO.setSecure(ServiceSecurityType.CERTIFICATE.name());
-        requestDTO.setServiceUri(Constants.STATION_CONTROLLER_PATH + uriPostfix);
-        requestDTO.setInterfaces(List.of(CommonConstants.HTTP_SECURE_JSON));
-        requestDTO.setEndOfValidity(validity);
-        requestDTO.setProviderSystem(getSystemRequest(ipAddress, port, authInfo));
-        requestDTO.setServiceDefinition(serviceDef);
-        return requestDTO;
-    }
-
     private DeviceRequestDTO getDeviceRequest(String ipAddress, String macAddress, String authInfo) {
         return new DeviceRequestDTO(commonName, ipAddress, macAddress, authInfo);
     }
 
     private SystemRequestDTO getSystemRequest(final String ipAddress, final int port, final String authInfo) {
         return new SystemRequestDTO(commonName, ipAddress, port, authInfo);
+    }
+
+    @EventListener(OffboardingFinishedEvent.class)
+    public void stopLeds() {
+        green.turnOff();
+        red.turnOff();
     }
 
     public SystemRequestDTO getSystemRequest() {

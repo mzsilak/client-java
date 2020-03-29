@@ -2,11 +2,10 @@ package eu.arrowhead.common.dto.shared;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-
 import java.io.Serializable;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.StringJoiner;
 
 @JsonInclude(Include.NON_NULL)
 public class SystemRegistryResponseDTO implements Serializable {
@@ -31,7 +30,8 @@ public class SystemRegistryResponseDTO implements Serializable {
 	}
 
 	public SystemRegistryResponseDTO(final long id, final SystemResponseDTO system, final DeviceResponseDTO provider, final String endOfValidity,
-									 final Map<String, String> metadata, final int version, final String createdAt, final String updatedAt) {
+                                   final Map<String, String> metadata, final int version, final String createdAt,
+                                   final String updatedAt) {
 		this.id = id;
 		this.system = system;
 		this.provider = provider;
@@ -81,4 +81,12 @@ public class SystemRegistryResponseDTO implements Serializable {
 	public int hashCode() {
 		return Objects.hash(id, system, provider, endOfValidity, metadata, version, createdAt, updatedAt);
 	}
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", SystemRegistryResponseDTO.class.getSimpleName() + "[", "]").add("id=" + id).add(
+            "system=" + system).add("provider=" + provider).add("endOfValidity='" + endOfValidity + "'").add(
+            "metadata=" + metadata).add("version=" + version).add("createdAt='" + createdAt + "'").add(
+            "updatedAt='" + updatedAt + "'").toString();
+    }
 }

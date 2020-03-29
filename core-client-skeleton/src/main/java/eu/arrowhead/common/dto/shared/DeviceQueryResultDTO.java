@@ -2,10 +2,10 @@ package eu.arrowhead.common.dto.shared;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
 
 @JsonInclude(Include.NON_NULL)
 public class DeviceQueryResultDTO implements Serializable
@@ -32,6 +32,12 @@ public class DeviceQueryResultDTO implements Serializable
 		this.deviceQueryData = deviceQueryData;
 		this.unfilteredHits = unfilteredHits;
 	}
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", DeviceQueryResultDTO.class.getSimpleName() + "[", "]")
+            .add("deviceQueryData=" + deviceQueryData).add("unfilteredHits=" + unfilteredHits).toString();
+    }
 
     //=================================================================================================
     // methods

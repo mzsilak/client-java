@@ -1,11 +1,11 @@
 package eu.arrowhead.common.dto.shared;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
-
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import java.util.StringJoiner;
 
 @JsonInclude(Include.NON_NULL)
 public class ServiceRegistryResponseDTO implements Serializable {
@@ -55,4 +55,17 @@ public class ServiceRegistryResponseDTO implements Serializable {
 	public void setInterfaces(final List<ServiceInterfaceResponseDTO> interfaces) { this.interfaces = interfaces; }
 	public void setCreatedAt(final String createdAt) { this.createdAt = createdAt; }
 	public void setUpdatedAt(final String updatedAt) { this.updatedAt = updatedAt; }
+
+    //-------------------------------------------------------------------------------------------------
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", ServiceRegistryResponseDTO.class.getSimpleName() + "[", "]").add("id=" + id).add(
+            "serviceDefinition=" + serviceDefinition).add("provider=" + provider).add("serviceUri='" + serviceUri + "'")
+                                                                                                  .add("endOfValidity='"
+                                                                                                           + endOfValidity
+                                                                                                           + "'").add(
+                "secure=" + secure).add("metadata=" + metadata).add("version=" + version).add(
+                "interfaces=" + interfaces).add("createdAt='" + createdAt + "'").add("updatedAt='" + updatedAt + "'")
+                                                                                                  .toString();
+    }
 }

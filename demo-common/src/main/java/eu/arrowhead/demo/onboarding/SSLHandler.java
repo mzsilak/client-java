@@ -2,7 +2,7 @@ package eu.arrowhead.demo.onboarding;
 
 import eu.arrowhead.common.SSLProperties;
 import eu.arrowhead.common.Utilities;
-import eu.arrowhead.common.dto.shared.CertificateResponseDTO;
+import eu.arrowhead.common.dto.shared.CertificateCreationResponseDTO;
 import eu.arrowhead.demo.ssl.TrustAllX509TrustManager;
 import eu.arrowhead.demo.utils.SSLUtilities;
 import java.io.ByteArrayInputStream;
@@ -32,7 +32,6 @@ import javax.net.ssl.TrustManagerFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -121,18 +120,19 @@ public class SSLHandler {
         return sslProperties.isSslEnabled();
     }
 
-    public void adaptSSLContext(final String commonName, final String certificateType,
-                                final CertificateResponseDTO response,
+    public void adaptSSLContext(final String commonName, final CertificateCreationResponseDTO response,
                                 final String cloudCert, final String rootCert)
         throws CertificateException, IOException, InvalidKeySpecException, NoSuchAlgorithmException, KeyStoreException {
         logger.info("Adapting SSLContext ...");
-        // return; /*
+
         logger.debug("Decoding private key ...");
+        final byte[] privateKeyRaw = Base64.getDecoder().decode(response.getKeyPairDTO().getPrivateKey());
         final PrivateKey privateKey = SSLUtilities
-            .parsePrivateKey(response.getPrivateKey(), response.getKeyAlgorithm());
+            .parsePrivateKey(privateKeyRaw, response.getKeyPairDTO().getKeyAlgorithm());
 
         logger.debug("Decoding certificates ...");
         final X509Certificate[] chain = new X509Certificate[3];
+        final String certificateType = response.getCertificateFormat();
         chain[0] = parseCertificate(response.getCertificate(), certificateType);
         chain[1] = parseCertificate(cloudCert, certificateType);
         chain[2] = parseCertificate(rootCert, certificateType);
