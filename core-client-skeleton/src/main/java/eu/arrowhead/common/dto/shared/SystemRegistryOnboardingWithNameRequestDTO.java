@@ -14,7 +14,7 @@ public class SystemRegistryOnboardingWithNameRequestDTO extends SystemRegistryRe
     // members
 
     private static final long serialVersionUID = -635438605292398404L;
-    private CertificateCreationRequestDTO certificateRequest;
+    private CertificateCreationRequestDTO certificateCreationRequest;
 
     //=================================================================================================
     // methods
@@ -25,37 +25,39 @@ public class SystemRegistryOnboardingWithNameRequestDTO extends SystemRegistryRe
     public SystemRegistryOnboardingWithNameRequestDTO(final SystemRequestDTO system, final DeviceRequestDTO provider,
                                                       final String endOfValidity) {
         super(system, provider, endOfValidity);
-        this.certificateRequest = new CertificateCreationRequestDTO(Objects.requireNonNull(system).getSystemName());
+        this.certificateCreationRequest = new CertificateCreationRequestDTO(
+            Objects.requireNonNull(system).getSystemName());
     }
 
     public SystemRegistryOnboardingWithNameRequestDTO(final SystemRequestDTO system, final DeviceRequestDTO provider,
                                                       final String endOfValidity,
-                                                      final CertificateCreationRequestDTO certificateRequest) {
+                                                      final CertificateCreationRequestDTO certificateCreationRequest) {
         super(system, provider, endOfValidity);
-        this.certificateRequest = certificateRequest;
+        this.certificateCreationRequest = certificateCreationRequest;
     }
 
 
     public SystemRegistryOnboardingWithNameRequestDTO(final SystemRequestDTO system, final DeviceRequestDTO provider,
                                                       final String endOfValidity, final Map<String, String> metadata,
                                                       final Integer version,
-                                                      final CertificateCreationRequestDTO certificateRequest) {
+                                                      final CertificateCreationRequestDTO certificateCreationRequest) {
         super(system, provider, endOfValidity, metadata, version);
-        this.certificateRequest = certificateRequest;
+        this.certificateCreationRequest = certificateCreationRequest;
     }
 
     //-------------------------------------------------------------------------------------------------
-    public CertificateCreationRequestDTO getCertificateRequest() {
-        return certificateRequest;
+    public CertificateCreationRequestDTO getCertificateCreationRequest() {
+        return certificateCreationRequest;
     }
 
-    public void setCertificateRequest(final CertificateCreationRequestDTO certificateRequest) {
-        this.certificateRequest = certificateRequest;
+    public void setCertificateCreationRequest(final CertificateCreationRequestDTO certificateCreationRequest) {
+        this.certificateCreationRequest = certificateCreationRequest;
     }
 
     @Override
     public String toString() {
         return new StringJoiner(", ", SystemRegistryOnboardingWithNameRequestDTO.class.getSimpleName() + "[", "]")
-            .add("certificateRequest=" + certificateRequest).add("parent=" + super.toString()).toString();
+            .add("certificateCreationRequest=" + certificateCreationRequest).add("parent=" + super.toString())
+            .toString();
     }
 }

@@ -15,14 +15,9 @@ import eu.arrowhead.demo.events.OffboardingFinishedEvent;
 import eu.arrowhead.demo.events.OnboardingFinishedEvent;
 import eu.arrowhead.demo.grovepi.ControllableLed;
 import eu.arrowhead.demo.onboarding.ArrowheadHandler;
-import eu.arrowhead.demo.ssl.SSLException;
 import eu.arrowhead.demo.utils.IpUtilities;
 import eu.arrowhead.demo.web.HttpServer;
 import java.io.IOException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
-import java.security.spec.InvalidKeySpecException;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.ServiceConfigurationError;
@@ -60,9 +55,7 @@ public class ChargingStationApplication {
                                       final HttpServer httpServer, final ArrowheadHandler onboardingHandler,
                                       @Value("${server.name}") final String commonName,
                                       @Qualifier("greenControl") final ControllableLed green,
-                                      @Qualifier("redControl") final ControllableLed red)
-        throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException, SSLException,
-               InvalidKeySpecException {
+                                      @Qualifier("redControl") final ControllableLed red) throws IOException {
         this.applicationEventPublisher = applicationEventPublisher;
         this.httpServer = httpServer;
         this.onboardingHandler = onboardingHandler;
@@ -108,7 +101,7 @@ public class ChargingStationApplication {
         } catch (final Exception e) {
             logger.warn("Issues during onboarding: {}", e.getMessage());
             performOffboarding();
-            throw new ServiceConfigurationError(e.getMessage());
+            throw new ServiceConfigurationError(e.getMessage(), e);
         }
 
         red.turnOff();

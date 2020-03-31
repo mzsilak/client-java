@@ -17,6 +17,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.UnrecoverableKeyException;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -132,10 +133,10 @@ public class SSLHandler {
 
         logger.debug("Decoding certificates ...");
         final X509Certificate[] chain = new X509Certificate[3];
-        final String certificateType = response.getCertificateFormat();
-        chain[0] = parseCertificate(response.getCertificate(), certificateType);
-        chain[1] = parseCertificate(cloudCert, certificateType);
-        chain[2] = parseCertificate(rootCert, certificateType);
+        final String certificateFormat = response.getCertificateFormat();
+        chain[0] = parseCertificate(response.getCertificate(), certificateFormat);
+        chain[1] = parseCertificate(cloudCert, certificateFormat);
+        chain[2] = parseCertificate(rootCert, certificateFormat);
 
         //final String alias = Utilities.getCertCNFromSubject(chain[0].getSubjectDN().getName());
 
@@ -189,6 +190,44 @@ public class SSLHandler {
 
         saveStore(keyStore, sslProperties.getKeyStore(), sslProperties.getKeyStorePassword());
         saveStore(trustStore, sslProperties.getTrustStore(), sslProperties.getTrustStorePassword());
+    }
+
+    public void adaptSSLContext(final String commonName, final CertificateCreationResponseDTO response)
+        throws InvalidKeySpecException, NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException {
+        logger.info("Adapting SSLContext ...");
+
+        logger.debug("Decoding private key ...");
+        final byte[] privateKeyRaw = Base64.getDecoder().decode(response.getKeyPairDTO().getPrivateKey());
+        final PrivateKey privateKey = SSLUtilities
+            .parsePrivateKey(privateKeyRaw, response.getKeyPairDTO().getKeyAlgorithm());
+
+        logger.debug("Decoding certificates ...");
+        final X509Certificate[] chain = loadAndDeleteKeyEntry(commonName);
+        chain[0] = parseCertificate(response.getCertificate(), response.getCertificateFormat());
+        storeKeyEntry(commonName, privateKey, chain);
+        loadStore(keyStore, sslProperties.getKeyStore(), sslProperties.getKeyStoreType(),
+                  sslProperties.getKeyStorePassword());
+    }
+
+    private X509Certificate[] loadAndDeleteKeyEntry(final String alias)
+        throws KeyStoreException, CertificateException, IOException {
+
+        logger.debug("Loading old certificate chain '{}' from keyStore", alias);
+        CertificateFactory cf = CertificateFactory.getInstance("X.509");
+        final Certificate[] chain = keyStore.getCertificateChain(alias);
+        final X509Certificate[] x509Chain = new X509Certificate[chain.length];
+
+        for (int i = 0; i < chain.length; i++) {
+            if (chain[i] instanceof X509Certificate) {
+                x509Chain[i] = (X509Certificate) chain[i];
+            } else {
+                try (final ByteArrayInputStream bais = new ByteArrayInputStream(chain[i].getEncoded())) {
+                    x509Chain[i] = (X509Certificate) cf.generateCertificate(bais);
+                }
+            }
+        }
+        keyStore.deleteEntry(alias);
+        return x509Chain;
     }
 
     public SSLContext createSSLContext()

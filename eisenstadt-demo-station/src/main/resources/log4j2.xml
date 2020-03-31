@@ -9,6 +9,7 @@
     <Logger name="GrovePi" level="warn"/>
     <Logger name="org.apache" level="info"/>
     <Logger name="org.springframework" level="info"/>
+    <Logger name="eu.arrowhead.demo.grovepi" level="warn"/>
     <Root level="trace">
       <AppenderRef ref="Console"/>
     </Root>

@@ -3,8 +3,6 @@ package eu.arrowhead.client.station;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.Scanner;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
@@ -20,17 +18,6 @@ public class RfidReadTest {
     public void scannerTest() {
         testData().forEach(this::scanner);
         Assert.assertEquals(4, i);
-    }
-
-    public void scanner(final String string) {
-        if (StringUtils.startsWith(string, CARD_UID)) {
-            count(StringUtils.remove(string, CARD_UID));
-        }
-    }
-
-    private void count(final String next) {
-        Assert.assertEquals("118,229,45,31", next);
-        i++;
     }
 
     /*
@@ -77,9 +64,20 @@ Sector 8 [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         return strings.stream();
     }
 
+    public void scanner(final String string) {
+        if (StringUtils.startsWith(string, CARD_UID)) {
+            count(StringUtils.remove(string, CARD_UID));
+        }
+    }
+
     private List<String> getCardDetected() {
         return List
             .of("Card read UID: 118,229,45,31", "Size: 8", "Sector 8 [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]");
+    }
+
+    private void count(final String next) {
+        Assert.assertEquals("118,229,45,31", next);
+        i++;
     }
 
 

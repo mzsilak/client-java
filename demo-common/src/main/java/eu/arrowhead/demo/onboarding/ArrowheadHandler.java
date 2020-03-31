@@ -96,8 +96,15 @@ public class ArrowheadHandler {
         return sslHandler.getEncodedPublicKey();
     }
 
-    public void registerDevice(final DeviceRegistryOnboardingWithNameRequestDTO registryRequestDTO) {
-        register(registryRequestDTO, DeviceRegistryOnboardingWithNameResponseDTO.class, deviceRegistry.getUri());
+    public void registerDevice(final DeviceRegistryOnboardingWithNameRequestDTO registryRequestDTO)
+        throws NoSuchAlgorithmException, CertificateException, InvalidKeySpecException, KeyStoreException,
+               IOException, SSLException {
+        var httpResponse = register(registryRequestDTO, DeviceRegistryOnboardingWithNameResponseDTO.class,
+                                    deviceRegistry.getUri());
+
+        sslHandler.adaptSSLContext(registryRequestDTO.getCertificateCreationRequest().getCommonName(),
+                                   httpResponse.getCertificateResponse());
+        httpClient.setSecure();
     }
 
     private <REQ, RES> RES register(final REQ registryRequest, final Class<RES> responseCls, final URI uri) {
@@ -107,8 +114,14 @@ public class ArrowheadHandler {
         return responseEntity.getBody();
     }
 
-    public void registerSystem(final SystemRegistryOnboardingWithNameRequestDTO registryRequestDTO) {
-        register(registryRequestDTO, SystemRegistryOnboardingWithNameResponseDTO.class, systemRegistry.getUri());
+    public void registerSystem(final SystemRegistryOnboardingWithNameRequestDTO registryRequestDTO)
+        throws NoSuchAlgorithmException, CertificateException, InvalidKeySpecException, KeyStoreException,
+               IOException, SSLException {
+        var httpResponse = register(registryRequestDTO, SystemRegistryOnboardingWithNameResponseDTO.class,
+                                    systemRegistry.getUri());
+        sslHandler.adaptSSLContext(registryRequestDTO.getCertificateCreationRequest().getCommonName(),
+                                   httpResponse.getCertificateResponse());
+        httpClient.setSecure();
     }
 
     public void registerService(final ServiceRegistryRequestDTO registryRequestDTO) {
