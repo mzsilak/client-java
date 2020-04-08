@@ -76,9 +76,7 @@ public class ElectricCarApplication {
                                   @Value("${server.rfid}") final String rfid,
                                   @Qualifier("greenControl") final ControllableLed green,
                                   @Qualifier("redControl") final ControllableLed red,
-                                  final GroveButtonObserver buttonObserver)
-        throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException, SSLException,
-               InvalidKeySpecException {
+                                  final GroveButtonObserver buttonObserver) throws IOException {
         this.applicationEventPublisher = applicationEventPublisher;
         this.httpServer = httpServer;
         this.onboardingHandler = onboardingHandler;
