@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.swing.text.View;
 
 public class IpUtilities {
 
@@ -56,6 +57,10 @@ public class IpUtilities {
     public static String getMacAddress(final InetAddress inetAddress) throws SocketException {
         NetworkInterface network = NetworkInterface.getByInetAddress(inetAddress);
         byte[] mac = network.getHardwareAddress();
+
+        if (mac == null) {
+            mac = new byte[]{0, 0, 0, 0, 0, 0};
+        }
 
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < mac.length; i++) {

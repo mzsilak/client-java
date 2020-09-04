@@ -6,6 +6,7 @@ import eu.arrowhead.common.core.CoreSystem;
 import eu.arrowhead.common.core.CoreSystemService;
 import eu.arrowhead.common.dto.shared.DeviceRegistryOnboardingWithNameRequestDTO;
 import eu.arrowhead.common.dto.shared.DeviceRegistryOnboardingWithNameResponseDTO;
+import eu.arrowhead.common.dto.shared.DeviceResponseDTO;
 import eu.arrowhead.common.dto.shared.OnboardingWithNameRequestDTO;
 import eu.arrowhead.common.dto.shared.OnboardingWithNameResponseDTO;
 import eu.arrowhead.common.dto.shared.OrchestrationFlags;
@@ -20,6 +21,7 @@ import eu.arrowhead.common.dto.shared.ServiceRegistryResponseDTO;
 import eu.arrowhead.common.dto.shared.SystemRegistryOnboardingWithNameRequestDTO;
 import eu.arrowhead.common.dto.shared.SystemRegistryOnboardingWithNameResponseDTO;
 import eu.arrowhead.common.dto.shared.SystemRequestDTO;
+import eu.arrowhead.common.dto.shared.SystemResponseDTO;
 import eu.arrowhead.common.exception.ArrowheadException;
 import eu.arrowhead.demo.ssl.SSLException;
 import java.io.IOException;
@@ -96,7 +98,7 @@ public class ArrowheadHandler {
         return sslHandler.getEncodedPublicKey();
     }
 
-    public void registerDevice(final DeviceRegistryOnboardingWithNameRequestDTO registryRequestDTO)
+    public DeviceResponseDTO registerDevice(final DeviceRegistryOnboardingWithNameRequestDTO registryRequestDTO)
         throws NoSuchAlgorithmException, CertificateException, InvalidKeySpecException, KeyStoreException,
                IOException, SSLException {
         var httpResponse = register(registryRequestDTO, DeviceRegistryOnboardingWithNameResponseDTO.class,
@@ -105,6 +107,7 @@ public class ArrowheadHandler {
         sslHandler.adaptSSLContext(registryRequestDTO.getCertificateCreationRequest().getCommonName(),
                                    httpResponse.getCertificateResponse());
         httpClient.setSecure();
+        return httpResponse.getDevice();
     }
 
     private <REQ, RES> RES register(final REQ registryRequest, final Class<RES> responseCls, final URI uri) {
@@ -114,7 +117,7 @@ public class ArrowheadHandler {
         return responseEntity.getBody();
     }
 
-    public void registerSystem(final SystemRegistryOnboardingWithNameRequestDTO registryRequestDTO)
+    public SystemResponseDTO registerSystem(final SystemRegistryOnboardingWithNameRequestDTO registryRequestDTO)
         throws NoSuchAlgorithmException, CertificateException, InvalidKeySpecException, KeyStoreException,
                IOException, SSLException {
         var httpResponse = register(registryRequestDTO, SystemRegistryOnboardingWithNameResponseDTO.class,
@@ -122,10 +125,11 @@ public class ArrowheadHandler {
         sslHandler.adaptSSLContext(registryRequestDTO.getCertificateCreationRequest().getCommonName(),
                                    httpResponse.getCertificateResponse());
         httpClient.setSecure();
+        return httpResponse.getSystem();
     }
 
-    public void registerService(final ServiceRegistryRequestDTO registryRequestDTO) {
-        register(registryRequestDTO, ServiceRegistryResponseDTO.class, serviceRegistry.getUri());
+    public ServiceRegistryResponseDTO registerService(final ServiceRegistryRequestDTO registryRequestDTO) {
+        return register(registryRequestDTO, ServiceRegistryResponseDTO.class, serviceRegistry.getUri());
     }
 
     public void unregisterDevice(final String deviceName, final String macAddress) {

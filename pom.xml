@@ -21,21 +21,17 @@
 
   <modelVersion>4.0.0</modelVersion>
   <groupId>eu.arrowhead</groupId>
-  <artifactId>eisenstadt-demo</artifactId>
+  <artifactId>pinkafeld-aeeintec</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <modules>
     <module>core-client-skeleton</module>
-    <module>GrovePi-spec</module>
-    <module>GrovePi-pi4j</module>
     <module>demo-common</module>
-    <module>eisenstadt-demo-car</module>
-    <module>eisenstadt-demo-station</module>
-    <module>eisenstadt-demo-car-exec</module>
-    <module>eisenstadt-demo-station-exec</module>
-    <module>eisenstadt-demo-led</module>
-    <module>eisenstadt-demo-rfid</module>
+    <module>intec-idaice</module>
+    <module>intec-plc</module>
+    <module>intec-idaice-exec</module>
+    <module>intec-plc-exec</module>
   </modules>
 
   <properties>
