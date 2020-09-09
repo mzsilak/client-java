@@ -4,7 +4,6 @@ import eu.arrowhead.common.dto.shared.OrchestrationResponseDTO;
 import eu.arrowhead.common.dto.shared.OrchestrationResultDTO;
 import eu.arrowhead.common.dto.shared.ServiceQueryFormDTO;
 import eu.arrowhead.common.dto.shared.SystemRequestDTO;
-import eu.arrowhead.common.dto.shared.SystemResponseDTO;
 import eu.arrowhead.common.exception.ArrowheadException;
 import eu.arrowhead.demo.dto.Constants;
 import eu.arrowhead.demo.onboarding.ArrowheadHandler;
@@ -19,42 +18,40 @@ public class PlcLookupService {
 
     private final Logger logger = LogManager.getLogger();
     private final ArrowheadHandler arrowheadHandler;
-    private final IdaIceApplication application;
+    private final SystemRequestDTO systemRequestDTO;
 
     @Autowired
-    public PlcLookupService(ArrowheadHandler arrowheadHandler, IdaIceApplication application) {
+    public PlcLookupService(ArrowheadHandler arrowheadHandler, SystemRequestDTO systemRequestDTO) {
         this.arrowheadHandler = arrowheadHandler;
-        this.application = application;
+        this.systemRequestDTO = systemRequestDTO;
     }
 
     public String getPlcAddress() {
         logger.info("PLC requested");
+        final String uri;
 
-        final ServiceQueryFormDTO queryFormDTO = new ServiceQueryFormDTO();
-        queryFormDTO.setServiceDefinitionRequirement(Constants.SERVICE_PLC_LOOKUP);
-
-        final SystemResponseDTO systemResponseDTO = application.getSystemResponseDTO();
-        final SystemRequestDTO systemRequestDTO = new SystemRequestDTO();
-        systemRequestDTO.setSystemName(systemResponseDTO.getSystemName());
-        systemRequestDTO.setAddress(systemResponseDTO.getAddress());
-        systemRequestDTO.setPort(systemResponseDTO.getPort());
-
-        final OrchestrationResponseDTO orchestrationResponseDTO = arrowheadHandler
-            .lookupOrchestration(queryFormDTO, systemRequestDTO);
-        final List<OrchestrationResultDTO> dtoList = orchestrationResponseDTO.getResponse();
-
-        if (dtoList.size() > 0) {
-            return dtoList.get(0).getServiceUri();
-        } else {
-            throw new ArrowheadException("PLC service not found");
-        }
-    }
-
-    private void sleep() {
         try {
-            Thread.sleep(500L);
-        } catch (InterruptedException e) {
-            logger.warn("Interrupted!", e);
+            final ServiceQueryFormDTO queryFormDTO = new ServiceQueryFormDTO();
+            queryFormDTO.setServiceDefinitionRequirement(Constants.SERVICE_PLC_LOOKUP);
+
+            final OrchestrationResponseDTO orchestrationResponseDTO = arrowheadHandler
+                .lookupOrchestration(queryFormDTO, systemRequestDTO);
+            final List<OrchestrationResultDTO> dtoList = orchestrationResponseDTO.getResponse();
+
+            if (dtoList.size() > 0) {
+                uri = dtoList.get(0).getServiceUri();
+            } else {
+                throw new ArrowheadException("PLC service not found");
+            }
+
+            if (uri.startsWith("/")) {
+                return uri.substring(1);
+            } else {
+                return uri;
+            }
+        } catch (ArrowheadException e) {
+            logger.fatal(e.getMessage());
+            throw e;
         }
     }
 }

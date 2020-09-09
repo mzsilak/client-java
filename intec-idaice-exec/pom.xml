@@ -44,7 +44,7 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
         <configuration>
-          <mainClass>eu.arrowhead.client.idaice.IdeIceMain</mainClass>
+          <mainClass>eu.arrowhead.client.idaice.IdaIceMain</mainClass>
           <includeSystemScope>true</includeSystemScope>
           <requiresUnpack>
             <dependency>
