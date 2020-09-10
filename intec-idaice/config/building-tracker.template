@@ -2,7 +2,7 @@
 (set-value [@ doc_ Plant "Import"] |server| "$OPC_UA_URL$")
 (set-value [@ doc_ Plant "Export"] |server| "$OPC_UA_URL$")
 (:update [@ doc_]
-((Simulation_date :N Simulation_date)
+((Simulation_data :N Simulation_date)
 (:Par :N Options :V "SAMPLING \"$OPC_UA_URL$\" -1 -1"))
 )
 (:show doc_)
