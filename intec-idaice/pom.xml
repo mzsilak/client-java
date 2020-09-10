@@ -52,9 +52,14 @@
                 <resource>
                   <directory>src/main/resources</directory>
                   <includes>
-                    <include>application.properties</include>
+                    <include>banner.txt</include>
                     <include>log4j2.xml</include>
                   </includes>
+                  <!--excludes>
+                    <exclude>building-tracker.template</exclude>
+                    <exclude>start.bat</exclude>
+                    <exclude>application.properties</exclude>
+                  </excludes-->
                 </resource>
               </resources>
             </configuration>

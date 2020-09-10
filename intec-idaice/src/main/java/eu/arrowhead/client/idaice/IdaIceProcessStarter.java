@@ -54,25 +54,31 @@ public class IdaIceProcessStarter {
 
         @Override
         public void run() {
-            btLogger.info("Starting Building Tracker with {}", file);
             final ProcessBuilder builder;
             final Process process;
             final String[] args = new String[]{"cmd", "/c", "ice.exe", "-X", file};
+            btLogger.info("Starting Building Tracker: {}", (Object) args);
 
             try {
                 builder = new ProcessBuilder(args);
+                btLogger.debug("Setting home directory to {}", homeDirectory);
                 builder.directory(new File(homeDirectory));
                 process = builder.start();
 
                 final StreamGobbler inGobbler = new StreamGobbler(process.getInputStream(), btLogger::debug);
                 final StreamGobbler errGobbler = new StreamGobbler(process.getErrorStream(), btLogger::error);
+                btLogger.debug("Redirecting streams ...");
+
                 executorService.submit(inGobbler);
                 executorService.submit(errGobbler);
 
+                btLogger.debug("Waiting for exit and sleeping 3 more seconds and ...");
                 final int code = process.waitFor();
+                Thread.sleep(3_000L);
+
                 btLogger.info("Application finished with exit code {}", code);
             } catch (IOException e) {
-                btLogger.error("Unable to start ice.exe ({}): {}", args, e.getMessage());
+                btLogger.error("Unable to start ice.exe: {}", e.getMessage());
             } catch (InterruptedException e) {
                 btLogger.error("Process interrupted", e);
             }

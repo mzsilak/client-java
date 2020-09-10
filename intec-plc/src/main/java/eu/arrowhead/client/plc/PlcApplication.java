@@ -106,12 +106,12 @@ public class PlcApplication {
     }
 
     private ServiceRegistryRequestDTO getServiceRegistryRequest(final String ipAddress, final int port,
-                                                                final String validity,
-                                                                final String authInfo, final String uriPostfix,
+                                                                final String validity, final String authInfo,
+                                                                final String serviceUri,
                                                                 final String serviceDef) {
         final ServiceRegistryRequestDTO requestDTO = new ServiceRegistryRequestDTO();
         requestDTO.setSecure(ServiceSecurityType.CERTIFICATE.name());
-        requestDTO.setServiceUri(Constants.PLC_CONTROLLER_PATH + uriPostfix);
+        requestDTO.setServiceUri(serviceUri);
         requestDTO.setInterfaces(List.of(CommonConstants.HTTP_SECURE_JSON));
         requestDTO.setEndOfValidity(validity);
         requestDTO.setProviderSystem(getSystemRequest(ipAddress, port, authInfo));

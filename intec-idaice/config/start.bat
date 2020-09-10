@@ -1,0 +1,1 @@
+java -Dlog4j.configurationFile=log4j2.xml -cp building-tracker.template -jar intec-idaice-exec-1.0.0-SNAPSHOT.jar

@@ -1,4 +1,0 @@
-(:set doc_ (:call get-document "$IDM_FILE$"))
-(set-value [@ "$IMPORT$"] |server| "$OPC_UA_URL$")
-(:show doc_)
-(run-realtime doc_)

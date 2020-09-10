@@ -38,8 +38,14 @@ public class PlcLookupService {
                 .lookupOrchestration(queryFormDTO, systemRequestDTO);
             final List<OrchestrationResultDTO> dtoList = orchestrationResponseDTO.getResponse();
 
+            logger.debug("Orchestrator returned {} results", dtoList.size());
+
             if (dtoList.size() > 0) {
-                uri = dtoList.get(0).getServiceUri();
+                final OrchestrationResultDTO orchResult = dtoList.get(dtoList.size() - 1);
+                logger
+                    .debug("Choosing latest result with serviceUri '{}' from provider: {}", orchResult.getServiceUri(),
+                           orchResult.getProvider());
+                uri = orchResult.getServiceUri();
             } else {
                 throw new ArrowheadException("PLC service not found");
             }
