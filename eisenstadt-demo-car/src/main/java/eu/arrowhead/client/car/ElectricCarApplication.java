@@ -165,13 +165,23 @@ public class ElectricCarApplication {
             httpClient
                 .sendRequest(registerUri, HttpMethod.POST, RegisterResponseDTO.class, new RegisterRequestDTO(rfid));
 
-            applicationEventPublisher.publishEvent(new OnboardingFinishedEvent(this));
             red.turnOff();
             onboarded.set(true);
         } catch (final Exception e) {
-            logger.warn("Onboarding issue: {}: {}", e.getClass().getSimpleName(), e.getMessage());
+      logger.error("Onboarding issue: {}: {}", e.getClass().getSimpleName(), e.getMessage(), e);
             performOffboarding();
         }
+
+    try {
+      applicationEventPublisher.publishEvent(new OnboardingFinishedEvent(this));
+    } catch (final Exception e) {
+      logger.warn("Publishing issue: {}: {}", e.getClass().getSimpleName(), e.getMessage(), e);
+      try {
+        startWebServer();
+      } catch (IOException ex) {
+        logger.error("Unable to start webserver: {}: {}", e.getClass().getSimpleName(), e.getMessage(), e);
+      }
+    }
     }
 
     @EventListener(OnboardingFinishedEvent.class)
