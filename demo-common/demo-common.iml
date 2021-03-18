@@ -29,8 +29,8 @@
     <orderEntry type="module" module-name="core-client-skeleton" />
     <orderEntry type="library" name="Maven: org.springframework:spring-web:5.1.7.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-beans:5.1.7.RELEASE" level="project" />
-    <orderEntry type="module" module-name="GrovePi-spec" />
-    <orderEntry type="module" module-name="GrovePi-pi4j" />
+    <orderEntry type="library" name="Maven: org.iot.raspberry:GrovePi-spec:0.1.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.iot.raspberry:GrovePi-pi4j:0.1.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: com.pi4j:pi4j-core:1.0" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter:2.1.5.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot:2.1.5.RELEASE" level="project" />
